@@ -2,6 +2,27 @@ import { useState } from "react";
 import { IceCream, Coffee, Cake, Candy, Lollipop, PartyPopper, Tent } from "lucide-react";
 import ProductModal from "./ProductModal";
 
+// Import product images
+import chocolateBar from "@/assets/products/chocolate-bar.png";
+import vanillaBar from "@/assets/products/vanilla-bar.png";
+import strawberryBar from "@/assets/products/strawberry-bar.png";
+import mangoBar from "@/assets/products/mango-bar.png";
+import orangeBar from "@/assets/products/orange-bar.png";
+import chocolateCone from "@/assets/products/chocolate-cone.png";
+import strawberryCone from "@/assets/products/strawberry-cone.png";
+import vanillaCone from "@/assets/products/vanilla-cone.png";
+import butterscotchCone from "@/assets/products/butterscotch-cone.png";
+import chocoVanillaCone from "@/assets/products/choco-vanilla-cone.png";
+import kesarPistaKulfi from "@/assets/products/kesar-pista-kulfi.png";
+import mangoKulfi from "@/assets/products/mango-kulfi.png";
+import malaiKulfi from "@/assets/products/malai-kulfi.png";
+import roseKulfi from "@/assets/products/rose-kulfi.png";
+import pistaKulfi from "@/assets/products/pista-kulfi.png";
+import familyCup from "@/assets/products/family-cup.png";
+import twistPop from "@/assets/products/twist-pop.png";
+import iceSandwich from "@/assets/products/ice-sandwich.png";
+import iceCreamCake from "@/assets/products/ice-cream-cake.png";
+
 const categories = [
   {
     id: "bar-baar",
@@ -9,10 +30,11 @@ const categories = [
     icon: IceCream,
     color: "bg-gradient-to-br from-orange-400 to-red-500",
     products: [
-      { name: "Chocolate Bar", price: "₹50", image: "🍫" },
-      { name: "Vanilla Bar", price: "₹45", image: "🍦" },
-      { name: "Strawberry Bar", price: "₹50", image: "🍓" },
-      { name: "Mango Bar", price: "₹55", image: "🥭" },
+      { name: "Chocolate Bar", price: "₹50", image: chocolateBar },
+      { name: "Vanilla Bar", price: "₹45", image: vanillaBar },
+      { name: "Strawberry Bar", price: "₹50", image: strawberryBar },
+      { name: "Mango Bar", price: "₹55", image: mangoBar },
+      { name: "Orange Bar", price: "₹55", image: orangeBar },
     ]
   },
   {
@@ -21,10 +43,11 @@ const categories = [
     icon: IceCream,
     color: "bg-gradient-to-br from-blue-400 to-cyan-500",
     products: [
-      { name: "Chocolate Cone", price: "₹60", image: "🍦" },
-      { name: "Strawberry Cone", price: "₹60", image: "🍓" },
-      { name: "Vanilla Cone", price: "₹55", image: "🍨" },
-      { name: "Butterscotch Cone", price: "₹65", image: "🍦" },
+      { name: "Chocolate Cone", price: "₹60", image: chocolateCone },
+      { name: "Strawberry Cone", price: "₹60", image: strawberryCone },
+      { name: "Vanilla Cone", price: "₹55", image: vanillaCone },
+      { name: "Butterscotch Cone", price: "₹65", image: butterscotchCone },
+      { name: "Choco-Vanilla Cone", price: "₹65", image: chocoVanillaCone },
     ]
   },
   {
@@ -33,10 +56,11 @@ const categories = [
     icon: Lollipop,
     color: "bg-gradient-to-br from-green-400 to-teal-500",
     products: [
-      { name: "Kesar Pista Kulfi", price: "₹70", image: "🍡" },
-      { name: "Mango Kulfi", price: "₹65", image: "🥭" },
-      { name: "Malai Kulfi", price: "₹60", image: "🥛" },
-      { name: "Rose Kulfi", price: "₹70", image: "🌹" },
+      { name: "Kesar Pista Kulfi", price: "₹70", image: kesarPistaKulfi },
+      { name: "Mango Kulfi", price: "₹65", image: mangoKulfi },
+      { name: "Malai Kulfi", price: "₹60", image: malaiKulfi },
+      { name: "Rose Kulfi", price: "₹70", image: roseKulfi },
+      { name: "Pista Kulfi", price: "₹70", image: pistaKulfi },
     ]
   },
   {
@@ -45,10 +69,10 @@ const categories = [
     icon: Coffee,
     color: "bg-gradient-to-br from-purple-400 to-pink-500",
     products: [
-      { name: "Family Cup", price: "₹100", image: "🥤" },
-      { name: "Solo Cup", price: "₹50", image: "🥤" },
-      { name: "Party Cup", price: "₹80", image: "🥤" },
-      { name: "Premium Cup", price: "₹120", image: "🥤" },
+      { name: "Family Cup", price: "₹100", image: familyCup },
+      { name: "Solo Cup", price: "₹50", image: vanillaCone },
+      { name: "Party Cup", price: "₹80", image: familyCup },
+      { name: "Premium Cup", price: "₹120", image: familyCup },
     ]
   },
   {
@@ -57,10 +81,10 @@ const categories = [
     icon: PartyPopper,
     color: "bg-gradient-to-br from-yellow-400 to-orange-500",
     products: [
-      { name: "Twist Pop", price: "₹40", image: "🍭" },
-      { name: "Ice Sandwich", price: "₹45", image: "🥪" },
-      { name: "Candy Pop", price: "₹35", image: "🍬" },
-      { name: "Fruity Bar", price: "₹50", image: "🍓" },
+      { name: "Twist Pop", price: "₹40", image: twistPop },
+      { name: "Ice Sandwich", price: "₹45", image: iceSandwich },
+      { name: "Candy Pop", price: "₹35", image: twistPop },
+      { name: "Fruity Bar", price: "₹50", image: strawberryBar },
     ]
   },
   {
@@ -69,10 +93,10 @@ const categories = [
     icon: PartyPopper,
     color: "bg-gradient-to-br from-pink-400 to-rose-500",
     products: [
-      { name: "Party Pack", price: "₹500", image: "🎉" },
-      { name: "Mega Pack", price: "₹800", image: "🎊" },
-      { name: "Family Pack", price: "₹600", image: "👨‍👩‍👧‍👦" },
-      { name: "Kids Pack", price: "₹400", image: "🧒" },
+      { name: "Party Pack", price: "₹500", image: familyCup },
+      { name: "Mega Pack", price: "₹800", image: familyCup },
+      { name: "Family Pack", price: "₹600", image: familyCup },
+      { name: "Kids Pack", price: "₹400", image: familyCup },
     ]
   },
   {
@@ -81,10 +105,10 @@ const categories = [
     icon: Coffee,
     color: "bg-gradient-to-br from-indigo-400 to-purple-500",
     products: [
-      { name: "500ml Tub", price: "₹200", image: "🥣" },
-      { name: "1L Tub", price: "₹350", image: "🥣" },
-      { name: "2L Tub", price: "₹600", image: "🥣" },
-      { name: "Family Tub", price: "₹450", image: "🥣" },
+      { name: "500ml Tub", price: "₹200", image: familyCup },
+      { name: "1L Tub", price: "₹350", image: familyCup },
+      { name: "2L Tub", price: "₹600", image: familyCup },
+      { name: "Family Tub", price: "₹450", image: familyCup },
     ]
   },
   {
@@ -93,10 +117,10 @@ const categories = [
     icon: Cake,
     color: "bg-gradient-to-br from-amber-400 to-yellow-500",
     products: [
-      { name: "Ice Cream Cake", price: "₹800", image: "🎂" },
-      { name: "Pastry", price: "₹120", image: "🍰" },
-      { name: "Mini Cake", price: "₹400", image: "🧁" },
-      { name: "Premium Cake", price: "₹1200", image: "🎂" },
+      { name: "Ice Cream Cake", price: "₹800", image: iceCreamCake },
+      { name: "Pastry", price: "₹120", image: iceCreamCake },
+      { name: "Mini Cake", price: "₹400", image: iceCreamCake },
+      { name: "Premium Cake", price: "₹1200", image: iceCreamCake },
     ]
   },
   {
@@ -105,10 +129,10 @@ const categories = [
     icon: Candy,
     color: "bg-gradient-to-br from-red-400 to-pink-500",
     products: [
-      { name: "Candy Mix", price: "₹30", image: "🍬" },
-      { name: "Lollipop", price: "₹20", image: "🍭" },
-      { name: "Gummy Bears", price: "₹40", image: "🐻" },
-      { name: "Toffee Mix", price: "₹35", image: "🍬" },
+      { name: "Candy Mix", price: "₹30", image: twistPop },
+      { name: "Lollipop", price: "₹20", image: twistPop },
+      { name: "Gummy Bears", price: "₹40", image: twistPop },
+      { name: "Toffee Mix", price: "₹35", image: twistPop },
     ]
   },
   {
@@ -117,10 +141,10 @@ const categories = [
     icon: IceCream,
     color: "bg-gradient-to-br from-rose-400 to-red-500",
     products: [
-      { name: "Dark Chocobar", price: "₹55", image: "🍫" },
-      { name: "Milk Chocobar", price: "₹50", image: "🍫" },
-      { name: "White Chocobar", price: "₹60", image: "🤍" },
-      { name: "Nuts Chocobar", price: "₹65", image: "🥜" },
+      { name: "Dark Chocobar", price: "₹55", image: chocolateBar },
+      { name: "Milk Chocobar", price: "₹50", image: chocolateBar },
+      { name: "White Chocobar", price: "₹60", image: vanillaBar },
+      { name: "Nuts Chocobar", price: "₹65", image: chocolateBar },
     ]
   },
   {
@@ -129,10 +153,10 @@ const categories = [
     icon: Lollipop,
     color: "bg-gradient-to-br from-orange-400 to-pink-500",
     products: [
-      { name: "Mango Sorbet", price: "₹80", image: "🥭" },
-      { name: "Lemon Sorbet", price: "₹75", image: "🍋" },
-      { name: "Berry Sorbet", price: "₹85", image: "🍓" },
-      { name: "Orange Sorbet", price: "₹80", image: "🍊" },
+      { name: "Mango Sorbet", price: "₹80", image: mangoBar },
+      { name: "Lemon Sorbet", price: "₹75", image: vanillaBar },
+      { name: "Berry Sorbet", price: "₹85", image: strawberryBar },
+      { name: "Orange Sorbet", price: "₹80", image: orangeBar },
     ]
   },
   {
@@ -141,10 +165,10 @@ const categories = [
     icon: Tent,
     color: "bg-gradient-to-br from-cyan-400 to-blue-500",
     products: [
-      { name: "Fun Pack", price: "₹150", image: "🎪" },
-      { name: "Cartoon Pop", price: "₹40", image: "🎈" },
-      { name: "Rainbow Cup", price: "₹60", image: "🌈" },
-      { name: "Kids Special", price: "₹100", image: "🎉" },
+      { name: "Fun Pack", price: "₹150", image: familyCup },
+      { name: "Cartoon Pop", price: "₹40", image: twistPop },
+      { name: "Rainbow Cup", price: "₹60", image: familyCup },
+      { name: "Kids Special", price: "₹100", image: twistPop },
     ]
   },
 ];

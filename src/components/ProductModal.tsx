@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 interface Product {
   name: string;
   price: string;
-  image: string;
+  image: string; // Now it's an imported image path
 }
 
 interface Category {
@@ -91,12 +91,14 @@ const ProductModal = ({ category, isOpen, onClose }: ProductModalProps) => {
 
                     {/* Right Product Image */}
                     <div className="flex items-center justify-center">
-                      <div className="relative">
+                      <div className="relative w-full max-w-md">
                         <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-3xl"></div>
-                        <div className="relative bg-gradient-to-br from-amber-100 to-amber-50 rounded-3xl p-12 shadow-2xl">
-                          <div className="text-9xl animate-float">
-                            {product.image}
-                          </div>
+                        <div className="relative bg-gradient-to-br from-white/20 to-white/10 rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-sm">
+                          <img 
+                            src={product.image} 
+                            alt={product.name}
+                            className="w-full h-auto object-contain animate-float drop-shadow-2xl"
+                          />
                         </div>
                       </div>
                     </div>
