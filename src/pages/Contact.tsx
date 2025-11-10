@@ -187,79 +187,223 @@ const Contact = () => {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            <Card 
-              className="overflow-hidden"
-              style={{ 
-                background: "var(--gradient-card)",
-                boxShadow: "var(--shadow-soft)"
-              }}
-            >
+            <Card className="overflow-hidden border-2 hover:shadow-xl transition-shadow">
+              <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-6 text-white">
+                <h2 className="text-2xl font-bold mb-2">हमसे संपर्क करें</h2>
+                <p className="text-pink-50">Contact Information</p>
+              </div>
               <CardContent className="p-8 space-y-6">
-                <h2 className="text-2xl font-bold text-foreground mb-6">Get in touch</h2>
-                
-                <div className="flex items-start gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full shrink-0">
-                    <MapPin className="w-6 h-6 text-primary" />
+                <div className="flex items-start gap-4 group">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full shrink-0 group-hover:scale-110 transition-transform">
+                    <MapPin className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Visit Us</h3>
-                    <p className="text-muted-foreground">
-                      123 Ice Cream Lane<br />
-                      New Delhi, India 110001
+                    <h3 className="font-bold text-foreground mb-1">हमारी दुकान</h3>
+                    <p className="text-sm text-muted-foreground mb-1">Visit Our Store</p>
+                    <p className="text-foreground font-medium">
+                      Gopalganj Main Market<br />
+                      Near Bus Stand, Gopalganj<br />
+                      Bihar - 841428
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full shrink-0">
-                    <Phone className="w-6 h-6 text-primary" />
+                <div className="h-px bg-gradient-to-r from-transparent via-pink-200 to-transparent"></div>
+
+                <div className="flex items-start gap-4 group">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full shrink-0 group-hover:scale-110 transition-transform">
+                    <Phone className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Call Us</h3>
-                    <p className="text-muted-foreground">
+                    <h3 className="font-bold text-foreground mb-1">फ़ोन नंबर</h3>
+                    <p className="text-sm text-muted-foreground mb-1">Call Us Anytime</p>
+                    <p className="text-foreground font-medium">
                       +91 98765 43210<br />
-                      Mon-Sun: 10 AM - 10 PM
+                      +91 87654 32109
                     </p>
+                    <p className="text-xs text-muted-foreground mt-1">Mon-Sun: 9 AM - 10 PM</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full shrink-0">
-                    <Mail className="w-6 h-6 text-primary" />
+                <div className="h-px bg-gradient-to-r from-transparent via-purple-200 to-transparent"></div>
+
+                <div className="flex items-start gap-4 group">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-full shrink-0 group-hover:scale-110 transition-transform">
+                    <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Email Us</h3>
-                    <p className="text-muted-foreground">
+                    <h3 className="font-bold text-foreground mb-1">ईमेल पता</h3>
+                    <p className="text-sm text-muted-foreground mb-1">Email Address</p>
+                    <p className="text-foreground font-medium">
                       hello@namastebharat.com<br />
                       support@namastebharat.com
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">24-hour response time</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden border-2 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
+              <CardContent className="p-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                  <h3 className="text-xl font-bold text-foreground">Business Hours</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                    <span className="font-medium text-foreground">सोमवार - शुक्रवार</span>
+                    <span className="font-bold text-orange-600 dark:text-orange-400">9 AM - 10 PM</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                    <span className="font-medium text-foreground">शनिवार - रविवार</span>
+                    <span className="font-bold text-orange-600 dark:text-orange-400">9 AM - 11 PM</span>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground pt-2">
+                    💝 Open on all festivals & holidays!
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden border-2 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+              <CardContent className="p-8 text-center">
+                <h3 className="text-lg font-bold text-foreground mb-3">Follow Us</h3>
+                <p className="text-sm text-muted-foreground mb-4">सोशल मीडिया पर जुड़ें</p>
+                <div className="flex justify-center gap-4">
+                  <a href="#" className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full hover:scale-110 transition-transform">
+                    <Instagram className="w-6 h-6 text-white" />
+                  </a>
+                  <a href="#" className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-full hover:scale-110 transition-transform">
+                    <Facebook className="w-6 h-6 text-white" />
+                  </a>
+                  <a href="#" className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full hover:scale-110 transition-transform">
+                    <Twitter className="w-6 h-6 text-white" />
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Map Section */}
+        <div className="mt-16 max-w-6xl mx-auto">
+          <Card className="overflow-hidden border-2">
+            <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-6 text-white">
+              <div className="flex items-center justify-center gap-3">
+                <MapPin className="w-6 h-6" />
+                <h2 className="text-2xl font-bold">हमारी लोकेशन / Our Location</h2>
+              </div>
+            </div>
+            <CardContent className="p-0">
+              <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                <div className="text-center space-y-3">
+                  <MapPinIcon className="w-16 h-16 text-primary mx-auto" />
+                  <p className="text-lg font-semibold text-foreground">Namaste Bharat Ice Cream</p>
+                  <p className="text-muted-foreground">Gopalganj Main Market, Bihar</p>
+                  <Button className="mt-4 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
+                    Open in Google Maps
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* FAQ or Additional Info */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-foreground mb-3">Quick Information</h2>
+            <p className="text-muted-foreground">आपके सवालों के जवाब</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20 border-2 border-pink-200 dark:border-pink-800">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-3">
+                  <IceCream className="w-6 h-6 text-pink-600 dark:text-pink-400 mt-1" />
+                  <div>
+                    <h3 className="font-bold text-foreground mb-2">Bulk Orders</h3>
+                    <p className="text-sm text-muted-foreground">
+                      बल्क ऑर्डर के लिए कम से कम 24 घंटे पहले संपर्क करें। Special discounts available on large orders!
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card 
-              className="overflow-hidden"
-              style={{ 
-                background: "var(--gradient-card)",
-                boxShadow: "var(--shadow-soft)"
-              }}
-            >
-              <CardContent className="p-8">
-                <h3 className="text-xl font-bold text-foreground mb-4">Business Hours</h3>
-                <div className="space-y-2 text-muted-foreground">
-                  <div className="flex justify-between">
-                    <span>Monday - Friday</span>
-                    <span className="font-medium text-foreground">10 AM - 10 PM</span>
+            <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 border-2 border-purple-200 dark:border-purple-800">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-3">
+                  <Phone className="w-6 h-6 text-purple-600 dark:text-purple-400 mt-1" />
+                  <div>
+                    <h3 className="font-bold text-foreground mb-2">Home Delivery</h3>
+                    <p className="text-sm text-muted-foreground">
+                      10 किलोमीटर की दूरी तक फ्री होम डिलीवरी। Same day delivery available within Gopalganj!
+                    </p>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Saturday - Sunday</span>
-                    <span className="font-medium text-foreground">9 AM - 11 PM</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-2 border-blue-200 dark:border-blue-800">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-1" />
+                  <div>
+                    <h3 className="font-bold text-foreground mb-2">Custom Flavors</h3>
+                    <p className="text-sm text-muted-foreground">
+                      कस्टम फ्लेवर बनवाने के लिए हमें कॉल करें। We can create special flavors for events!
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-2 border-green-200 dark:border-green-800">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-3">
+                  <Clock className="w-6 h-6 text-green-600 dark:text-green-400 mt-1" />
+                  <div>
+                    <h3 className="font-bold text-foreground mb-2">Quick Response</h3>
+                    <p className="text-sm text-muted-foreground">
+                      हम 24 घंटे के अंदर जवाब देते हैं। Email responses within 24 hours, call for immediate help!
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Final CTA */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <Card className="overflow-hidden border-0">
+            <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-12 text-center text-white">
+              <h2 className="text-3xl font-bold mb-4">
+                Ready to Taste the Magic? 🍦
+              </h2>
+              <p className="text-lg mb-6 text-pink-50">
+                स्वाद है भारत का! Visit us or order now!
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-purple-600 hover:bg-gray-100 rounded-full font-semibold"
+                  onClick={() => window.location.href = '/menu'}
+                >
+                  View Menu
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="bg-transparent border-2 border-white text-white hover:bg-white/10 rounded-full font-semibold"
+                >
+                  Call Now
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
 
