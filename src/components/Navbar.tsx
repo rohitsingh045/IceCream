@@ -1,17 +1,27 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Facebook, Instagram, Youtube, User, LogIn, Menu, Search, LogOut } from "lucide-react";
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import CartSheet from "./CartSheet";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { isSignedIn, isLoaded } = useUser();
+  const { user, isAuthenticated, logout } = useAuth();
   
   const isActive = (path: string) => location.pathname === path;
   
@@ -24,6 +34,7 @@ const Navbar = () => {
   const navLinks = [
     { path: "/", label: "Home" },
     { path: "/menu", label: "Our Products" },
+    { path: "/services", label: "Our Services" },
     { path: "/about", label: "About Us" },
     { path: "/careers", label: "Careers" },
     { path: "/contact", label: "Contact Us" },
@@ -130,38 +141,52 @@ const Navbar = () => {
             
             {/* Auth Buttons */}
             <div className="flex items-center gap-1.5">
-              {isLoaded && isSignedIn ? (
-                <div className="flex items-center gap-1.5">
-                  <UserButton 
-                    afterSignOutUrl="/"
-                    appearance={{
-                      elements: {
-                        avatarBox: "w-8 h-8 ring-2 ring-primary/20 hover:ring-primary transition-all"
-                      }
-                    }}
-                  />
-                </div>
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                      <Avatar className="h-8 w-8 ring-2 ring-primary/20 hover:ring-primary transition-all">
+                        <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white">
+                          {user?.name?.charAt(0).toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user?.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => logout()}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <>
-                  <SignInButton mode="modal">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="h-9 px-3 text-xs border border-primary/30 text-primary hover:bg-primary hover:text-white rounded-full font-semibold transition-all"
-                    >
-                      <LogIn className="w-3.5 h-3.5 mr-1.5" />
-                      Login
-                    </Button>
-                  </SignInButton>
-                  <SignUpButton mode="modal">
-                    <Button 
-                      size="sm"
-                      className="h-9 px-3 text-xs bg-gradient-to-r from-primary to-secondary text-white hover:shadow-md rounded-full font-semibold transition-all"
-                    >
-                      <User className="w-3.5 h-3.5 mr-1.5" />
-                      Sign Up
-                    </Button>
-                  </SignUpButton>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigate('/login')}
+                    className="h-9 px-3 text-xs border border-primary/30 text-primary hover:bg-primary hover:text-white rounded-full font-semibold transition-all"
+                  >
+                    <LogIn className="w-3.5 h-3.5 mr-1.5" />
+                    Login
+                  </Button>
+                  <Button 
+                    size="sm"
+                    onClick={() => navigate('/signup')}
+                    className="h-9 px-3 text-xs bg-gradient-to-r from-primary to-secondary text-white hover:shadow-md rounded-full font-semibold transition-all"
+                  >
+                    <User className="w-3.5 h-3.5 mr-1.5" />
+                    Sign Up
+                  </Button>
                 </>
               )}
             </div>
@@ -222,38 +247,52 @@ const Navbar = () => {
 
                   {/* Auth Buttons */}
                   <div className="flex flex-col gap-3">
-                    {isLoaded && isSignedIn ? (
-                      <div className="flex items-center justify-center pt-2">
-                        <UserButton 
-                          afterSignOutUrl="/"
-                          appearance={{
-                            elements: {
-                              avatarBox: "w-10 h-10"
-                            }
+                    {isAuthenticated ? (
+                      <div className="flex flex-col items-center gap-3 pt-2">
+                        <Avatar className="h-12 w-12 ring-2 ring-primary/20">
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-lg">
+                            {user?.name?.charAt(0).toUpperCase() || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="text-center">
+                          <p className="text-sm font-medium">{user?.name}</p>
+                          <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        </div>
+                        <Button 
+                          variant="outline"
+                          className="w-full rounded-full"
+                          onClick={() => {
+                            logout();
+                            setIsOpen(false);
                           }}
-                        />
+                        >
+                          <LogOut className="w-4 h-4 mr-2" />
+                          Log out
+                        </Button>
                       </div>
                     ) : (
                       <>
-                        <SignInButton mode="modal">
-                          <Button 
-                            variant="outline"
-                            className="w-full rounded-full"
-                            onClick={() => setIsOpen(false)}
-                          >
-                            <LogIn className="w-4 h-4 mr-2" />
-                            Login
-                          </Button>
-                        </SignInButton>
-                        <SignUpButton mode="modal">
-                          <Button 
-                            className="w-full rounded-full"
-                            onClick={() => setIsOpen(false)}
-                          >
-                            <User className="w-4 h-4 mr-2" />
-                            Sign Up
-                          </Button>
-                        </SignUpButton>
+                        <Button 
+                          variant="outline"
+                          className="w-full rounded-full"
+                          onClick={() => {
+                            navigate('/login');
+                            setIsOpen(false);
+                          }}
+                        >
+                          <LogIn className="w-4 h-4 mr-2" />
+                          Login
+                        </Button>
+                        <Button 
+                          className="w-full rounded-full"
+                          onClick={() => {
+                            navigate('/signup');
+                            setIsOpen(false);
+                          }}
+                        >
+                          <User className="w-4 h-4 mr-2" />
+                          Sign Up
+                        </Button>
                       </>
                     )}
                   </div>

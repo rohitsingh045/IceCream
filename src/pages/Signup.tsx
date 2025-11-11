@@ -9,6 +9,7 @@ import { Mail, Lock, Eye, EyeOff, User, Phone, IceCream } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,8 +22,10 @@ const Signup = () => {
     confirmPassword: "",
   });
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { signup } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -31,19 +34,61 @@ const Signup = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
+    // Validate all fields are filled
+    if (!formData.fullName || !formData.email || !formData.password || !formData.confirmPassword) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Invalid Email ❌",
+        description: "Please enter a valid email address (e.g., user@example.com)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate name length
+    if (formData.fullName.trim().length < 2) {
+      toast({
+        title: "Invalid Name",
+        description: "Name must be at least 2 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      toast({
+        title: "Weak Password",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password match
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Password Mismatch",
+        title: "Password Mismatch ❌",
         description: "Passwords do not match. Please try again.",
         variant: "destructive",
       });
       return;
     }
 
+    // Validate terms agreement
     if (!agreeTerms) {
       toast({
         title: "Terms & Conditions",
@@ -53,16 +98,31 @@ const Signup = () => {
       return;
     }
 
-    // Simulate signup
-    toast({
-      title: "Account Created!",
-      description: "Welcome to Namaste Bharat Ice Cream family",
-    });
+    setIsLoading(true);
     
-    // Redirect to home after successful signup
-    setTimeout(() => {
-      navigate("/");
-    }, 1500);
+    try {
+      await signup(formData.fullName, formData.email, formData.phone, formData.password);
+      
+      toast({
+        title: "Account Created! 🎉",
+        description: "Welcome to Namaste Bharat Ice Cream family",
+      });
+      
+      // Redirect to home after successful signup
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred. Please try again.";
+      
+      toast({
+        title: "Signup Failed ❌",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -239,8 +299,9 @@ const Signup = () => {
                   type="submit" 
                   className="w-full rounded-full" 
                   size="lg"
+                  disabled={isLoading}
                 >
-                  Create Account
+                  {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
 
                 {/* Divider */}

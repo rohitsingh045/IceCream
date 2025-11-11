@@ -9,28 +9,56 @@ import { Mail, Lock, Eye, EyeOff, IceCream } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simulate login
-    toast({
-      title: "Login Successful!",
-      description: "Welcome back to Namaste Bharat Ice Cream",
-    });
+    // Validate inputs
+    if (!email || !password) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both email and password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
     
-    // Redirect to home after successful login
-    setTimeout(() => {
-      navigate("/");
-    }, 1500);
+    try {
+      await login(email, password);
+      
+      toast({
+        title: "Login Successful! ✨",
+        description: "Welcome back to Namaste Bharat Ice Cream",
+      });
+      
+      // Redirect to home after successful login
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Please check your credentials and try again.";
+      
+      toast({
+        title: "Login Failed ❌",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -140,8 +168,9 @@ const Login = () => {
                   type="submit" 
                   className="w-full rounded-full" 
                   size="lg"
+                  disabled={isLoading}
                 >
-                  Sign In
+                  {isLoading ? "Signing In..." : "Sign In"}
                 </Button>
 
                 {/* Divider */}
