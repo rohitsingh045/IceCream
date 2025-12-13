@@ -28,7 +28,7 @@ import Footer from "@/components/Footer";
 const OurServices = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+     
       
       <div className="container mx-auto px-4 py-12">
         {/* Hero Section */}
@@ -373,7 +373,6 @@ const OurServices = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

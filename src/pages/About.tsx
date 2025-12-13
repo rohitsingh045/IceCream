@@ -115,8 +115,7 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    
       <div className="container mx-auto px-4 py-12">
         {/* Hero Header */}
         <div className="relative bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-3xl p-8 md:p-16 mb-12 overflow-hidden">
@@ -522,7 +521,6 @@ const About = () => {
           </div>
         </div>
       </div>
-
       <Footer />
     </div>
   );

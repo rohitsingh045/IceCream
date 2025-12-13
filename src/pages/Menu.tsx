@@ -1,16 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { IceCream, ShoppingCart, Heart, X, Plus, Minus, Star, Package } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  IceCream,
+  ShoppingCart,
+  Heart,
+  X,
+  Plus,
+  Minus,
+  Star,
+  Package,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
+import { useAuth } from "@/contexts/AuthContext";
 
-// Import product images
 import kesarPistaKulfi from "@/assets/products/kesar-pista-kulfi.png";
 import mangoKulfi from "@/assets/products/mango-kulfi.png";
 import roseKulfi from "@/assets/products/rose-kulfi.png";
@@ -39,15 +59,27 @@ const Menu = () => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { user, token } = useAuth();
 
-  const menuItems = [
+  const [backendMenuItems, setBackendMenuItems] = useState<any[]>([]);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({
+    category: "",
+    description: "",
+    price: "",
+    image: "",
+  });
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [isUploadingEditImage, setIsUploadingEditImage] = useState(false);
+
+  const staticMenuItems = [
     {
       id: "kesar-pista-cone",
       name: "Kesar Pista Kulfi",
       category: "Cones",
       price: 120,
       image: kesarPistaKulfi,
-      description: "Royal saffron with crunchy pistachios in a crispy cone"
+      description: "Royal saffron with crunchy pistachios in a crispy cone",
     },
     {
       id: "mango-kulfi-cup",
@@ -55,7 +87,7 @@ const Menu = () => {
       category: "Cups",
       price: 100,
       image: mangoKulfi,
-      description: "Authentic Indian mango delight served in a cup"
+      description: "Authentic Indian mango delight served in a cup",
     },
     {
       id: "rose-falooda-sundae",
@@ -63,7 +95,7 @@ const Menu = () => {
       category: "Sundaes",
       price: 180,
       image: roseKulfi,
-      description: "Fragrant rose with vermicelli, nuts, and toppings"
+      description: "Fragrant rose with vermicelli, nuts, and toppings",
     },
     {
       id: "chocolate-chip-cone",
@@ -71,7 +103,7 @@ const Menu = () => {
       category: "Cones",
       price: 90,
       image: chocolateCone,
-      description: "Classic chocolate with real chocolate chips"
+      description: "Classic chocolate with real chocolate chips",
     },
     {
       id: "strawberry-cup",
@@ -79,7 +111,7 @@ const Menu = () => {
       category: "Cups",
       price: 80,
       image: strawberryCone,
-      description: "Fresh strawberry ice cream in a convenient cup"
+      description: "Fresh strawberry ice cream in a convenient cup",
     },
     {
       id: "family-pack-variety",
@@ -87,7 +119,7 @@ const Menu = () => {
       category: "Family Packs",
       price: 500,
       image: familyCup,
-      description: "1L tub with 4 different flavors of your choice"
+      description: "1L tub with 4 different flavors of your choice",
     },
     {
       id: "vanilla-cone",
@@ -95,7 +127,7 @@ const Menu = () => {
       category: "Cones",
       price: 70,
       image: vanillaCone,
-      description: "Classic vanilla in a crispy wafer cone"
+      description: "Classic vanilla in a crispy wafer cone",
     },
     {
       id: "butterscotch-sundae",
@@ -103,7 +135,7 @@ const Menu = () => {
       category: "Sundaes",
       price: 160,
       image: butterscotchCone,
-      description: "Creamy butterscotch with caramel sauce and nuts"
+      description: "Creamy butterscotch with caramel sauce and nuts",
     },
     {
       id: "pista-kulfi-cone",
@@ -111,7 +143,7 @@ const Menu = () => {
       category: "Cones",
       price: 130,
       image: pistaKulfi,
-      description: "Rich pistachio kulfi with real crushed pistachios"
+      description: "Rich pistachio kulfi with real crushed pistachios",
     },
     {
       id: "malai-kulfi-cup",
@@ -119,7 +151,7 @@ const Menu = () => {
       category: "Cups",
       price: 110,
       image: malaiKulfi,
-      description: "Creamy traditional malai kulfi in a cup"
+      description: "Creamy traditional malai kulfi in a cup",
     },
     {
       id: "choco-vanilla-cone",
@@ -127,7 +159,7 @@ const Menu = () => {
       category: "Cones",
       price: 95,
       image: chocoVanillaCone,
-      description: "Perfect blend of chocolate and vanilla in one cone"
+      description: "Perfect blend of chocolate and vanilla in one cone",
     },
     {
       id: "chocolate-bar",
@@ -135,7 +167,7 @@ const Menu = () => {
       category: "Cups",
       price: 60,
       image: chocolateBar,
-      description: "Rich chocolate ice cream on a stick"
+      description: "Rich chocolate ice cream on a stick",
     },
     {
       id: "mango-bar",
@@ -143,7 +175,7 @@ const Menu = () => {
       category: "Cups",
       price: 60,
       image: mangoBar,
-      description: "Refreshing mango ice bar, perfect for summer"
+      description: "Refreshing mango ice bar, perfect for summer",
     },
     {
       id: "vanilla-bar",
@@ -151,7 +183,7 @@ const Menu = () => {
       category: "Cups",
       price: 55,
       image: vanillaBar,
-      description: "Classic vanilla ice cream bar"
+      description: "Classic vanilla ice cream bar",
     },
     {
       id: "strawberry-bar",
@@ -159,7 +191,7 @@ const Menu = () => {
       category: "Cups",
       price: 60,
       image: strawberryBar,
-      description: "Fresh strawberry ice cream on a stick"
+      description: "Fresh strawberry ice cream on a stick",
     },
     {
       id: "orange-bar",
@@ -167,7 +199,7 @@ const Menu = () => {
       category: "Cups",
       price: 55,
       image: orangeBar,
-      description: "Tangy orange ice bar, refreshingly cool"
+      description: "Tangy orange ice bar, refreshingly cool",
     },
     {
       id: "ice-cream-cake",
@@ -175,7 +207,7 @@ const Menu = () => {
       category: "Family Packs",
       price: 800,
       image: iceCreamCake,
-      description: "Delicious 1kg ice cream cake for celebrations"
+      description: "Delicious 1kg ice cream cake for celebrations",
     },
     {
       id: "ice-sandwich",
@@ -183,7 +215,7 @@ const Menu = () => {
       category: "Sundaes",
       price: 85,
       image: iceSandwich,
-      description: "Vanilla ice cream between two chocolate cookies"
+      description: "Vanilla ice cream between two chocolate cookies",
     },
     {
       id: "twist-pop",
@@ -191,28 +223,140 @@ const Menu = () => {
       category: "Cups",
       price: 50,
       image: twistPop,
-      description: "Fun twisted ice pop with dual flavors"
+      description: "Fun twisted ice pop with dual flavors",
     },
   ];
 
-  const filteredItems = activeCategory === "All" 
-    ? menuItems 
-    : menuItems.filter(item => item.category === activeCategory);
+  useEffect(() => {
+    const fetchMenuProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/api/products");
+        const data = await res.json();
 
-  const favoriteItems = menuItems.filter(item => isFavorite(item.id));
-  
+        if (!res.ok || !data.success) return;
+
+        const mapped = (data.products || [])
+          .filter((p: any) => p.displaySection === "products")
+          .map((p: any) => ({
+            id: `db-${p._id}`,
+            productId: p._id,
+            name: p.name,
+            category: p.category === "Cones" ? "Cones" : "Cups",
+            price: p.price,
+            image: p.image,
+            description: p.description || "",
+          }));
+
+        setBackendMenuItems(mapped);
+      } catch {
+        // ignore errors and keep static menu
+      }
+    };
+
+    fetchMenuProducts();
+  }, []);
+
+  const menuItems = [...staticMenuItems, ...backendMenuItems];
+
+  const filteredItems =
+    activeCategory === "All"
+      ? menuItems
+      : menuItems.filter((item) => item.category === activeCategory);
+
+  const favoriteItems = menuItems.filter((item) => isFavorite(item.id));
   const displayItems = activeTab === "favorites" ? favoriteItems : filteredItems;
+
+  const startEditProduct = (item: any) => {
+    if (!user || user.role !== "admin" || !item.productId) return;
+    setEditingProduct(item);
+    setEditForm({
+      category: item.category || "",
+      description: item.description || "",
+      price: item.price?.toString() || "",
+      image: item.image || "",
+    });
+  };
+
+  const handleUploadEditImage = async (file: File | null) => {
+    if (!token || !file) return;
+
+    try {
+      setIsUploadingEditImage(true);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const uploadRes = await fetch("http://localhost:5001/api/upload/product-image", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok || !uploadData.success) {
+        throw new Error(uploadData.message || "Image upload failed");
+      }
+
+      setEditForm((prev) => ({ ...prev, image: uploadData.url }));
+    } catch {
+      // silent fail here
+    } finally {
+      setIsUploadingEditImage(false);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!token || !editingProduct) return;
+
+    try {
+      setIsSavingEdit(true);
+      const payload = {
+        category: editForm.category,
+        description: editForm.description,
+        price: Number(editForm.price) || 0,
+        image: editForm.image,
+      };
+
+      const res = await fetch(
+        `http://localhost:5001/api/products/admin/${editingProduct.productId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to update product");
+      }
+
+      setBackendMenuItems((prev) =>
+        prev.map((p: any) =>
+          p.productId === editingProduct.productId
+            ? { ...p, ...payload, price: payload.price }
+            : p
+        )
+      );
+      setEditingProduct(null);
+    } catch {
+      // silent fail here
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <div className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
         <div className="relative bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-3xl p-8 md:p-12 mb-12 overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl"></div>
-          
+
           <div className="relative text-center space-y-4 animate-fade-in">
             <div className="inline-block">
               <Badge className="mb-4 text-sm px-4 py-1.5 bg-gradient-to-r from-primary to-secondary border-0 text-white">
@@ -228,27 +372,23 @@ const Menu = () => {
           </div>
         </div>
 
-        {/* Tabs for All Products and Favorites */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 h-12 bg-gradient-to-r from-primary/5 to-secondary/5 backdrop-blur-sm border border-primary/20">
-            <TabsTrigger 
-              value="all" 
+            <TabsTrigger
+              value="all"
               className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white rounded-lg transition-all"
             >
               <IceCream className="w-4 h-4 mr-2" />
               All Products
             </TabsTrigger>
-            <TabsTrigger 
-              value="favorites" 
+            <TabsTrigger
+              value="favorites"
               className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white rounded-lg transition-all"
             >
               <Heart className="w-4 h-4 mr-2" />
               My Favorites
               {favorites.length > 0 && (
-                <Badge 
-                  variant="secondary" 
-                  className="ml-2 bg-white text-primary shadow-lg"
-                >
+                <Badge variant="secondary" className="ml-2 bg-white text-primary shadow-lg">
                   {favorites.length}
                 </Badge>
               )}
@@ -256,7 +396,6 @@ const Menu = () => {
           </TabsList>
         </Tabs>
 
-        {/* Category Filter - Only show when on All Products tab */}
         {activeTab === "all" && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-center mb-6 flex items-center justify-center gap-2">
@@ -271,8 +410,8 @@ const Menu = () => {
                   variant={activeCategory === category ? "default" : "outline"}
                   onClick={() => setActiveCategory(category)}
                   className={`rounded-full px-6 py-2 font-semibold transition-all ${
-                    activeCategory === category 
-                      ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg scale-105" 
+                    activeCategory === category
+                      ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg scale-105"
                       : "hover:border-primary hover:text-primary"
                   }`}
                 >
@@ -283,7 +422,6 @@ const Menu = () => {
           </div>
         )}
 
-        {/* Empty Favorites Message */}
         {activeTab === "favorites" && favoriteItems.length === 0 && (
           <div className="text-center py-20 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-3xl">
             <div className="bg-gradient-to-br from-primary/10 to-secondary/10 w-24 h-24 rounded-full mx-auto flex items-center justify-center mb-6">
@@ -293,7 +431,7 @@ const Menu = () => {
             <p className="text-muted-foreground mb-8 text-lg">
               Start adding your favorite ice creams by clicking the heart icon!
             </p>
-            <Button 
+            <Button
               onClick={() => setActiveTab("all")}
               className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
             >
@@ -303,102 +441,113 @@ const Menu = () => {
           </div>
         )}
 
-        {/* Menu Grid */}
         {displayItems.length > 0 && (
           <>
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent inline-block">
-                {activeTab === "favorites" ? "Your Favorite Treats" : activeCategory === "All" ? "All Our Products" : activeCategory}
+                {activeTab === "favorites"
+                  ? "Your Favorite Treats"
+                  : activeCategory === "All"
+                  ? "All Our Products"
+                  : activeCategory}
               </h2>
               <p className="text-muted-foreground mt-2">
-                {displayItems.length} delicious {displayItems.length === 1 ? 'option' : 'options'} available
+                {displayItems.length} delicious {displayItems.length === 1 ? "option" : "options"} available
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {displayItems.map((item) => (
-                <Card 
+                <Card
                   key={item.id}
                   className="overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 relative group border-2 border-transparent hover:border-primary/20"
-                  style={{ 
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,240,245,0.9) 100%)",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,240,245,0.9) 100%)",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                   }}
                 >
                   <CardContent className="p-5 space-y-4">
-                  {/* Favorite Button */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={`absolute top-4 right-4 z-10 rounded-full transition-all ${
-                      isFavorite(item.id) 
-                        ? 'bg-red-500 hover:bg-red-600 text-white' 
-                        : 'bg-white/80 hover:bg-white text-gray-600'
-                    }`}
-                    onClick={() => toggleFavorite(item.id)}
-                  >
-                    <Heart 
-                      className={`w-5 h-5 transition-all ${
-                        isFavorite(item.id) ? 'fill-current' : ''
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`absolute top-4 right-4 z-10 rounded-full transition-all ${
+                        isFavorite(item.id)
+                          ? "bg-red-500 hover:bg-red-600 text-white"
+                          : "bg-white/80 hover:bg-white text-gray-600"
                       }`}
-                    />
-                  </Button>
+                      onClick={() => toggleFavorite(item.id)}
+                    >
+                      <Heart
+                        className={`w-5 h-5 transition-all ${
+                          isFavorite(item.id) ? "fill-current" : ""
+                        }`}
+                      />
+                    </Button>
 
-                  <div 
-                    className="aspect-square bg-gradient-to-br from-accent/20 to-primary/10 rounded-2xl flex items-center justify-center p-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-                    onClick={() => {
-                      setSelectedProduct(item);
-                      setQuantity(1);
-                    }}
-                  >
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-full object-contain animate-float drop-shadow-lg"
-                    />
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="inline-block px-3 py-1 bg-secondary/50 rounded-full text-xs font-medium">
-                        {item.category}
-                      </div>
-                      {isFavorite(item.id) && (
-                        <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
-                          Favorite
-                        </Badge>
+                    <div
+                      className="aspect-square bg-gradient-to-br from-accent/20 to-primary/10 rounded-2xl flex items-center justify-center p-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform relative"
+                      onClick={() => {
+                        setSelectedProduct(item);
+                        setQuantity(1);
+                      }}
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-contain animate-float drop-shadow-lg"
+                      />
+
+                      {user?.role === "admin" && (item as any).productId && (
+                        <div
+                          className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-200 backdrop-blur-[1px]"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startEditProduct(item);
+                          }}
+                        >
+                          <div className="absolute top-2 right-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 text-xs font-medium text-black shadow">
+                            Edit image & details
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                    <div className="flex items-center justify-between pt-2">
-                      <p className="text-2xl font-bold text-primary">₹{item.price}</p>
-                      <Button 
-                        size="sm"
-                        onClick={() => addToCart(item)}
-                        className="rounded-full"
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Add
-                      </Button>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="inline-block px-3 py-1 bg-secondary/50 rounded-full text-xs font-medium">
+                          {item.category}
+                        </div>
+                        {isFavorite(item.id) && (
+                          <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
+                            Favorite
+                          </Badge>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                      <div className="flex items-center justify-between pt-2">
+                        <p className="text-2xl font-bold text-primary">₹{item.price}</p>
+                        <Button size="sm" onClick={() => addToCart(item)} className="rounded-full">
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Add
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </>
         )}
       </div>
 
-      {/* Product Preview Sheet */}
       <Sheet open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
-        <SheetContent 
-          side="bottom" 
+        <SheetContent
+          side="bottom"
           className="h-[95vh] md:h-[90vh] p-0 rounded-t-3xl overflow-hidden md:max-w-5xl md:mx-auto md:mb-8 md:rounded-3xl"
         >
           {selectedProduct && (
             <div className="h-full flex flex-col md:flex-row">
-              {/* Header with Close Button - Mobile Only */}
               <div className="relative bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 px-6 py-4 md:hidden">
                 <Button
                   variant="ghost"
@@ -414,7 +563,6 @@ const Menu = () => {
                 </div>
               </div>
 
-              {/* Product Image Section - Desktop Only */}
               <div className="hidden md:flex md:w-1/2 md:items-center md:justify-center">
                 <div className="relative bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-950/20 dark:via-purple-950/20 dark:to-indigo-950/20 p-12 flex items-center justify-center h-full min-h-[600px] w-full">
                   <Button
@@ -436,9 +584,7 @@ const Menu = () => {
                 </div>
               </div>
 
-              {/* Product Info Section */}
               <div className="flex-1 md:w-1/2 flex flex-col overflow-y-auto">
-                {/* Product Image - Mobile Only */}
                 <div className="md:hidden relative bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-950/20 dark:via-purple-950/20 dark:to-indigo-950/20 p-8 flex items-center justify-center">
                   <div className="relative w-full max-w-xs aspect-square">
                     <div className="absolute inset-0 bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-200 dark:from-pink-800 dark:via-purple-800 dark:to-indigo-800 rounded-full blur-3xl opacity-30 animate-pulse"></div>
@@ -451,7 +597,6 @@ const Menu = () => {
                 </div>
 
                 <div className="p-6 md:p-8 space-y-6">
-                  {/* Category & Name */}
                   <div className="space-y-3">
                     <Badge className="bg-gradient-to-r from-pink-500 to-purple-600 text-white border-none px-3 py-1">
                       {selectedProduct.category}
@@ -464,7 +609,6 @@ const Menu = () => {
                     </p>
                   </div>
 
-                  {/* Rating Section */}
                   <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
@@ -475,7 +619,6 @@ const Menu = () => {
                     <span className="text-xs text-muted-foreground">(125 reviews)</span>
                   </div>
 
-                  {/* Price Display */}
                   <div className="flex items-center justify-between p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-2xl border-2 border-primary/10">
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">Price per piece</p>
@@ -488,7 +631,6 @@ const Menu = () => {
                     </div>
                   </div>
 
-                  {/* Quantity Selector */}
                   <div className="space-y-3">
                     <label className="text-sm font-bold text-foreground flex items-center gap-2">
                       <Package className="w-4 h-4" />
@@ -524,7 +666,6 @@ const Menu = () => {
                   </div>
                 </div>
 
-                {/* Fixed Bottom Actions */}
                 <div className="border-t bg-white dark:bg-gray-950 p-6 space-y-3 mt-auto">
                   <div className="flex gap-3">
                     <Button
@@ -533,7 +674,11 @@ const Menu = () => {
                       className="h-14 w-14 rounded-2xl border-2 hover:bg-red-50 dark:hover:bg-red-950/20"
                       onClick={() => toggleFavorite(selectedProduct.id)}
                     >
-                      <Heart className={`w-6 h-6 ${isFavorite(selectedProduct.id) ? 'fill-current text-red-500' : ''}`} />
+                      <Heart
+                        className={`w-6 h-6 ${
+                          isFavorite(selectedProduct.id) ? "fill-current text-red-500" : ""
+                        }`}
+                      />
                     </Button>
                     <Button
                       size="lg"
@@ -560,7 +705,83 @@ const Menu = () => {
         </SheetContent>
       </Sheet>
 
-      <Footer />
+      <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Product</DialogTitle>
+            <DialogDescription>
+              Update image, category, description, and price. Changes reflect immediately.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editingProduct && (
+            <div className="space-y-4">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-50 via-white to-blue-50">
+                <div className="aspect-[4/3] w-full overflow-hidden">
+                  <img
+                    src={editForm.image || editingProduct.image}
+                    alt={editingProduct.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 transition-opacity duration-200 backdrop-blur-[2px] flex items-center justify-center">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-sm font-medium shadow">
+                    {isUploadingEditImage ? "Uploading..." : "Replace image"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleUploadEditImage(e.target.files?.[0] || null)}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid gap-3">
+                <div className="grid gap-1">
+                  <Label>Category</Label>
+                  <Input
+                    value={editForm.category}
+                    onChange={(e) => setEditForm((prev) => ({ ...prev, category: e.target.value }))}
+                    placeholder="e.g., Cones"
+                  />
+                </div>
+
+                <div className="grid gap-1">
+                  <Label>Description</Label>
+                  <Textarea
+                    value={editForm.description}
+                    onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))}
+                    rows={3}
+                    placeholder="Short product description"
+                  />
+                </div>
+
+                <div className="grid gap-1">
+                  <Label>Price (₹)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editForm.price}
+                    onChange={(e) => setEditForm((prev) => ({ ...prev, price: e.target.value }))}
+                    placeholder="120"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter className="mt-2">
+                <Button variant="outline" onClick={() => setEditingProduct(null)} disabled={isSavingEdit}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveEdit} disabled={isSavingEdit}>
+                  {isSavingEdit ? "Saving..." : "Save"}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

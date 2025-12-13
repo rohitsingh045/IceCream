@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight, Star, IceCream, ShoppingCart, Heart, X, Plus, Minus, Package } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -11,6 +22,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import ProductCategories from "@/components/ProductCategories";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Import product images
 import kesarPistaKulfi from "@/assets/products/kesar-pista-kulfi.png";
@@ -27,8 +39,20 @@ const Home = () => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { user, token } = useAuth();
 
-  const featuredFlavors = [
+  const [backendSpecials, setBackendSpecials] = useState<any[]>([]);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({
+    category: "",
+    description: "",
+    price: "",
+    image: "",
+  });
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [isUploadingEditImage, setIsUploadingEditImage] = useState(false);
+
+  const featuredFlavorsStatic = [
     {
       id: "kesar-pista-home",
       name: "Kesar Pista Kulfi",
@@ -95,9 +119,131 @@ const Home = () => {
     },
   ];
 
+  // Load special products from backend (displaySection = 'home' or 'specials')
+  useEffect(() => {
+    const fetchSpecials = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/api/products");
+        const data = await res.json();
+
+        if (!res.ok || !data.success) return;
+
+        const mapped = (data.products || [])
+          .filter(
+            (p: any) =>
+              p.displaySection === "home" || p.displaySection === "specials"
+          )
+          .map((p: any) => ({
+            id: `db-${p._id}`,
+            productId: p._id,
+            name: p.name,
+            description: p.description || "",
+            price: p.price,
+            category: p.category || "Featured",
+            image: p.image,
+          }));
+
+        setBackendSpecials(mapped);
+      } catch (err) {
+        // Fail silently for now; keep static specials
+      }
+    };
+
+    fetchSpecials();
+  }, []);
+
+  const featuredFlavors = [...featuredFlavorsStatic, ...backendSpecials];
+
+  const startEditProduct = (prod: any) => {
+    if (!user || user.role !== "admin" || !prod.productId) return;
+    setEditingProduct(prod);
+    setEditForm({
+      category: prod.category || "",
+      description: prod.description || "",
+      price: prod.price?.toString() || "",
+      image: prod.image || "",
+    });
+  };
+
+  const handleUploadEditImage = async (file: File | null) => {
+    if (!token || !file) return;
+
+    try {
+      setIsUploadingEditImage(true);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const uploadRes = await fetch(
+        "http://localhost:5001/api/upload/product-image",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok || !uploadData.success) {
+        throw new Error(uploadData.message || "Image upload failed");
+      }
+
+      setEditForm((prev) => ({ ...prev, image: uploadData.url }));
+    } catch (err: any) {
+      // ignore on home surface
+    } finally {
+      setIsUploadingEditImage(false);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!token || !editingProduct) return;
+
+    try {
+      setIsSavingEdit(true);
+      const payload = {
+        category: editForm.category,
+        description: editForm.description,
+        price: Number(editForm.price) || 0,
+        image: editForm.image,
+      };
+
+      const res = await fetch(
+        `http://localhost:5001/api/products/admin/${editingProduct.productId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to update product");
+      }
+
+      setBackendSpecials((prev) =>
+        prev.map((item: any) =>
+          item.productId === editingProduct.productId
+            ? { ...item, ...payload, price: payload.price }
+            : item
+        )
+      );
+      setEditingProduct(null);
+    } catch (err: any) {
+      // ignore on home surface
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+    
       
       {/* Hero Carousel */}
       <HeroCarousel />
@@ -106,15 +252,16 @@ const Home = () => {
       <ProductCategories />
 
       {/* Featured Flavors */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center space-y-4 mb-12">
-          <div className="inline-flex items-center gap-2 text-primary">
+      <section className="container mx-auto px-2 py-10">
+        <div className="text-center space-y-2 mb-10">
+          {/* <div className="inline-flex items-center gap-2 text-primary">
             <Star className="w-5 h-5 fill-primary" />
             <span className="text-sm font-medium uppercase tracking-wider">Featured</span>
-          </div>
+          </div> */}
           <h2 className="text-4xl font-bold text-foreground">Our Special Flavors</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Hand-picked favorites that bring the taste of India to your palate
+            Hand-picked favorites that bring the taste of India to your palate <br/>
+            “भारत का असली स्वाद, खास आपके लिए चुना हुआ।”
           </p>
         </div>
 
@@ -147,18 +294,32 @@ const Home = () => {
                   />
                 </Button>
 
-                <div 
-                  className="aspect-square bg-gradient-to-br from-accent/20 to-primary/10 rounded-2xl flex items-center justify-center p-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                <div
+                  className="aspect-square bg-gradient-to-br from-accent/20 to-primary/10 rounded-2xl flex items-center justify-center p-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform relative"
                   onClick={() => {
                     setSelectedProduct(flavor);
                     setQuantity(1);
                   }}
                 >
-                  <img 
-                    src={flavor.image} 
+                  <img
+                    src={flavor.image}
                     alt={flavor.name}
                     className="w-full h-full object-contain animate-float drop-shadow-lg"
                   />
+
+                  {user?.role === "admin" && (flavor as any).productId && (
+                    <div
+                      className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-200 backdrop-blur-[1px]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditProduct(flavor);
+                      }}
+                    >
+                      <div className="absolute top-2 right-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 text-xs font-medium text-black shadow">
+                        Edit image & details
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -361,7 +522,98 @@ const Home = () => {
         </SheetContent>
       </Sheet>
 
-      <Footer />
+      {/* Admin edit modal for backend products */}
+      <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Product</DialogTitle>
+            <DialogDescription>
+              Update image, category, description, and price. Changes reflect immediately.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editingProduct && (
+            <div className="space-y-4">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-50 via-white to-blue-50">
+                <div className="aspect-[4/3] w-full overflow-hidden">
+                  <img
+                    src={editForm.image || editingProduct.image}
+                    alt={editingProduct.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 transition-opacity duration-200 backdrop-blur-[2px] flex items-center justify-center">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-sm font-medium shadow">
+                    {isUploadingEditImage ? "Uploading..." : "Replace image"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) =>
+                        handleUploadEditImage(e.target.files?.[0] || null)
+                      }
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid gap-3">
+                <div className="grid gap-1">
+                  <Label>Category</Label>
+                  <Input
+                    value={editForm.category}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, category: e.target.value }))
+                    }
+                    placeholder="e.g., Cones"
+                  />
+                </div>
+
+                <div className="grid gap-1">
+                  <Label>Description</Label>
+                  <Textarea
+                    value={editForm.description}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, description: e.target.value }))
+                    }
+                    rows={3}
+                    placeholder="Short product description"
+                  />
+                </div>
+
+                <div className="grid gap-1">
+                  <Label>Price (₹)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editForm.price}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, price: e.target.value }))
+                    }
+                    placeholder="120"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter className="mt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditingProduct(null)}
+                  disabled={isSavingEdit}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveEdit} disabled={isSavingEdit}>
+                  {isSavingEdit ? "Saving..." : "Save"}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+     
     </div>
   );
 };

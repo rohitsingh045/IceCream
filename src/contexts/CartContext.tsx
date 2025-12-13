@@ -1,94 +1,94 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { toast } from '@/hooks/use-toast';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { toast } from "sonner";
 
-export interface CartItem {
+interface CartItem {
   id: string;
   name: string;
   price: number;
   image: string;
   quantity: number;
-  category: string;
+  category?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  addToCart: (product: Omit<CartItem, "quantity">) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  getTotalItems: () => number;
-  getTotalPrice: () => number;
+  total: number;
+  itemCount: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    // Load cart from localStorage on init
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(items));
+  }, [items]);
+
+  const addToCart = (product: Omit<CartItem, "quantity">) => {
     setItems((prevItems) => {
-      const existingItem = prevItems.find((i) => i.id === item.id);
-      
+      const existingItem = prevItems.find((item) => item.id === product.id);
+
       if (existingItem) {
-        toast({
-          title: "🛒 Cart Updated!",
-          description: `${item.name} quantity increased to ${existingItem.quantity + 1}`,
-          className: "bg-gradient-to-r from-primary to-secondary text-white border-white/20",
-        });
-        return prevItems.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        // Update quantity if item already exists
+        toast.success(`Updated ${product.name} quantity in cart`);
+        return prevItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
+      } else {
+        // Add new item
+        toast.success(`Added ${product.name} to cart`);
+        return [...prevItems, { ...product, quantity: 1 }];
       }
-      
-      toast({
-        title: "✨ Added to Cart!",
-        description: `${item.name} (₹${item.price}) is ready for checkout`,
-        className: "bg-gradient-to-r from-green-500 to-emerald-600 text-white border-white/20",
-      });
-      return [...prevItems, { ...item, quantity: 1 }];
     });
   };
 
-  const removeFromCart = (id: string) => {
-    const removedItem = items.find((item) => item.id === id);
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    toast({
-      title: "🗑️ Removed from Cart",
-      description: `${removedItem?.name || "Item"} has been removed`,
-      className: "bg-gradient-to-r from-red-500 to-rose-600 text-white border-white/20",
+  const removeFromCart = (productId: string) => {
+    setItems((prevItems) => {
+      const item = prevItems.find((item) => item.id === productId);
+      if (item) {
+        toast.success(`Removed ${item.name} from cart`);
+      }
+      return prevItems.filter((item) => item.id !== productId);
     });
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(id);
+      removeFromCart(productId);
       return;
     }
-    
+
     setItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id ? { ...item, quantity } : item
+        item.id === productId ? { ...item, quantity } : item
       )
     );
   };
 
   const clearCart = () => {
-    const itemCount = getTotalItems();
     setItems([]);
-    toast({
-      title: "🧹 Cart Cleared",
-      description: `${itemCount} item${itemCount !== 1 ? 's' : ''} removed from your cart`,
-      className: "bg-gradient-to-r from-orange-500 to-amber-600 text-white border-white/20",
-    });
+    localStorage.removeItem("cart");
+    toast.success("Cart cleared");
   };
 
-  const getTotalItems = () => {
-    return items.reduce((total, item) => total + item.quantity, 0);
-  };
+  const total = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
-  const getTotalPrice = () => {
-    return items.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <CartContext.Provider
@@ -98,8 +98,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         removeFromCart,
         updateQuantity,
         clearCart,
-        getTotalItems,
-        getTotalPrice,
+        total,
+        itemCount,
       }}
     >
       {children}
@@ -110,7 +110,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 };

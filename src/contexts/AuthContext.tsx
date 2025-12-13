@@ -1,188 +1,82 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+// filepath: c:\Users\rohit\OneDrive\Desktop\ICE\src\contexts\AuthContext.tsx
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
-  phone?: string;
+  role: "user" | "admin";
 }
 
-interface AuthContextType {
+interface AuthContextValue {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, phone: string, password: string) => Promise<void>;
+  login: (payload: { token: string; user: User }) => void;
   logout: () => void;
-  isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
 
-  // Check for stored user on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const savedToken = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    if (savedToken) {
+      setToken(savedToken);
     }
-    setIsLoading(false);
+
+    if (savedUser && savedUser !== "undefined" && savedUser !== "null") {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+      } catch {
+        localStorage.removeItem("user");
+      }
+    }
   }, []);
 
-  const login = async (email: string, password: string) => {
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      throw new Error('Please enter a valid email address');
-    }
-
-    try {
-      const response = await fetch('http://localhost:5001/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      console.log('Login Response:', data); // Debug log
-
-      if (!response.ok) {
-        console.error('Login failed:', data); // Debug log
-        throw new Error(data.message || 'Invalid email or password');
-      }
-
-      // Store user data from backend (handle nested data structure)
-      const backendUser = data.data?.user || data.user;
-      const backendToken = data.data?.token || data.token;
-
-      if (!backendUser || !backendToken) {
-        console.error('Invalid response structure:', data); // Debug log
-        throw new Error('Invalid response from server');
-      }
-
-      const userData = {
-        id: backendUser._id || backendUser.id,
-        name: backendUser.name,
-        email: backendUser.email,
-        phone: backendUser.phone,
-      };
-
-      console.log('Setting user data:', userData); // Debug log
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', backendToken);
-    } catch (error) {
-      console.error('Login error:', error); // Debug log
-      // Clear any existing user data on failed login
-      setUser(null);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Unable to connect to server. Please check your connection.');
-    }
-  };
-
-  const signup = async (name: string, email: string, phone: string, password: string) => {
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      throw new Error('Please enter a valid email address');
-    }
-
-    // Validate name
-    if (!name || name.trim().length < 2) {
-      throw new Error('Please enter a valid name (minimum 2 characters)');
-    }
-
-    // Validate password
-    if (!password || password.length < 6) {
-      throw new Error('Password must be at least 6 characters long');
-    }
-
-    try {
-      const response = await fetch('http://localhost:5001/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, phone, password }),
-      });
-
-      const data = await response.json();
-      console.log('Signup Response:', data); // Debug log
-
-      if (!response.ok) {
-        console.error('Signup failed:', data); // Debug log
-        throw new Error(data.message || 'Registration failed. Email may already be registered.');
-      }
-
-      // Store user data from backend (handle nested data structure)
-      const backendUser = data.data?.user || data.user;
-      const backendToken = data.data?.token || data.token;
-
-      if (!backendUser || !backendToken) {
-        console.error('Invalid response structure:', data); // Debug log
-        throw new Error('Invalid response from server');
-      }
-
-      const userData = {
-        id: backendUser._id || backendUser.id,
-        name: backendUser.name,
-        email: backendUser.email,
-        phone: backendUser.phone,
-      };
-
-      console.log('Setting user data:', userData); // Debug log
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', backendToken);
-    } catch (error) {
-      console.error('Signup error:', error); // Debug log
-      // Clear any existing user data on failed signup
-      setUser(null);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Unable to connect to server. Please check your connection.');
-    }
+  const login = ({ token, user }: { token: string; user: User }) => {
+    setToken(token);
+    setUser(user);
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
   };
 
   const logout = () => {
+    setToken(null);
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        token,
+        isAuthenticated: !!token,
         login,
-        signup,
         logout,
-        isLoading,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
+}

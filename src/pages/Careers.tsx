@@ -81,8 +81,7 @@ const Careers = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    
       <div className="container mx-auto px-4 py-12">
         {/* Hero Section */}
         <div className="relative bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-3xl p-8 md:p-16 mb-12 overflow-hidden">
@@ -290,8 +289,8 @@ const Careers = () => {
                   <Phone className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="font-bold text-foreground mb-2">Call / WhatsApp</h3>
-                <a href="tel:+91XXXXXXXXXX" className="text-primary hover:underline font-semibold">
-                  +91-XXXXXXXXXX
+                <a href="tel:+919931584900" className="text-primary hover:underline font-semibold">
+                  +91-9931584900
                 </a>
               </div>
 
@@ -301,7 +300,7 @@ const Careers = () => {
                 </div>
                 <h3 className="font-bold text-foreground mb-2">Visit Office</h3>
                 <p className="text-muted-foreground text-sm">
-                  Namaste Bharat Ice Cream Factory, Gopalganj
+                  Namaste Bharat Ice Cream Factory,Konhwa more, Gopalganj
                 </p>
               </div>
             </div>
@@ -344,7 +343,6 @@ const Careers = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

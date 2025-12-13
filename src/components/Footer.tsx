@@ -135,9 +135,9 @@ const Footer = () => {
                 <div>
                   <p className="text-white/90 font-medium text-xs">Our Store</p>
                   <p className="text-white/70 text-xs leading-relaxed">
-                    123 Ice Cream Street,<br />
-                    Andheri West, Mumbai<br />
-                    Maharashtra 400053
+                    Ravi Enterprizes and Namaste Bharat Ice Cream,<br />
+                    Konhwa more,Gopalganj<br />
+                    Bihar 841428
                   </p>
                 </div>
               </div>
@@ -147,8 +147,8 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="text-white/90 font-medium text-xs">Call Us</p>
-                  <a href="tel:+911234567890" className="text-white/70 hover:text-white transition-colors text-xs">
-                    +91 123 456 7890
+                  <a href="tel:+919931584900" className="text-white/70 hover:text-white transition-colors text-xs">
+                    +91 9931584900
                   </a>
                 </div>
               </div>
@@ -167,10 +167,7 @@ const Footer = () => {
                 <div className="bg-white/20 p-2 rounded-lg group-hover:bg-white/30 transition-all">
                   <Clock className="w-4 h-4 text-white flex-shrink-0" />
                 </div>
-                <div>
-                  <p className="text-white/90 font-medium text-xs">Opening Hours</p>
-                  <p className="text-white/70 text-xs">Mon-Sun: 10 AM - 11 PM</p>
-                </div>
+               
               </div>
             </div>
           </div>
