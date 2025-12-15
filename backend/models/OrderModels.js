@@ -73,6 +73,13 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
     },
 
+    // Track who cancelled the order
+    cancelledBy: {
+      type: String,
+      enum: ["user", "admin", null],
+      default: null,
+    },
+
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed", "refunded"],

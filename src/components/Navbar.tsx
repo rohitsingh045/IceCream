@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate, NavLink } from "react-router-dom";
-import { Facebook, Instagram, MessageCircleMore, User, LogIn, Menu, Search, LogOut, X } from "lucide-react";
+import { Facebook, Instagram, MessageCircleMore, User, LogIn, Menu, Search, LogOut, X, UserCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -200,6 +200,11 @@ const Navbar = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/account')} className="cursor-pointer">
+                      <UserCircle className="mr-2 h-4 w-4" />
+                      <span>My Account</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => logout()} className="text-red-600 focus:text-red-600">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
@@ -328,6 +333,17 @@ const Navbar = () => {
                           <p className="text-base font-semibold text-gray-900">{user?.name}</p>
                           <p className="text-sm text-muted-foreground">{user?.email}</p>
                         </div>
+                        <Button 
+                          variant="outline"
+                          className="w-full rounded-full border-2 border-primary/30 text-primary hover:bg-primary/10 font-semibold shadow-sm"
+                          onClick={() => {
+                            navigate('/account');
+                            setIsOpen(false);
+                          }}
+                        >
+                          <UserCircle className="w-4 h-4 mr-2" />
+                          My Account
+                        </Button>
                         <Button 
                           variant="outline"
                           className="w-full rounded-full border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-semibold shadow-sm"

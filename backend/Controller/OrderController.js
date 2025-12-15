@@ -103,7 +103,21 @@ async function updateOrderStatus(req, res) {
         .json({ success: false, message: "Order not found" });
     }
 
+    // Prevent admin from changing user-cancelled orders
+    if (order.cancelledBy === "user") {
+      return res.status(400).json({
+        success: false,
+        message: "This order was cancelled by the user and cannot be modified",
+      });
+    }
+
     order.orderStatus = status;
+    
+    // Track who cancelled if status is cancelled
+    if (status === "cancelled") {
+      order.cancelledBy = "admin";
+    }
+    
     await order.save();
 
     // send automatic email to user
@@ -124,9 +138,84 @@ async function updateOrderStatus(req, res) {
   }
 }
 
+// USER: cancel own order (only if pending)
+async function cancelOrder(req, res) {
+  try {
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    // Check if the order belongs to the user
+    if (order.user.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Not authorized to cancel this order" });
+    }
+
+    // Only allow cancellation if order is pending
+    if (order.orderStatus.toLowerCase() !== "pending") {
+      return res.status(400).json({
+        success: false,
+        message: "Order cannot be cancelled. It has already been confirmed by the admin.",
+      });
+    }
+
+    order.orderStatus = "cancelled";
+    order.cancelledBy = "user";
+    await order.save();
+
+    // send automatic email to user about cancellation
+    sendOrderStatusEmail(order).catch((err) =>
+      console.error("Order cancellation email error:", err.message)
+    );
+
+    return res.json({
+      success: true,
+      message: "Order cancelled successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Cancel order error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to cancel order" });
+  }
+}
+
+// ADMIN: delete order
+async function deleteOrder(req, res) {
+  try {
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    await Order.findByIdAndDelete(req.params.id);
+
+    return res.json({
+      success: true,
+      message: "Order deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete order error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to delete order" });
+  }
+}
+
 module.exports = {
   createOrder,
   getOrders,
   getAdminOrders,
   updateOrderStatus,
+  cancelOrder,
+  deleteOrder,
 };

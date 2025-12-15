@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import {
   ShoppingBag,
@@ -16,13 +18,17 @@ import {
   Loader2,
   CheckCircle,
   ArrowLeft,
+  Package,
+  Minus,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { API_URL } from "@/lib/api";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { user, token, isAuthenticated } = useAuth();
-  const { items, total, clearCart } = useCart();
+  const { items, total, clearCart, updateQuantity, removeFromCart, itemCount } = useCart();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
 
@@ -37,7 +43,19 @@ const Checkout = () => {
     landmark: "",
   });
 
+  const [isInitialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
+    // Give cart a moment to load from localStorage
+    const timer = setTimeout(() => {
+      setIsInitialized(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isInitialized) return;
+    
     if (!isAuthenticated) {
       toast.error("Please login to checkout");
       navigate("/login");
@@ -49,7 +67,7 @@ const Checkout = () => {
       navigate("/cart");
       return;
     }
-  }, [isAuthenticated, items, navigate]);
+  }, [isAuthenticated, items, navigate, isInitialized]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -117,8 +135,15 @@ const Checkout = () => {
     }
   };
 
-  if (items.length === 0) {
-    return null;
+  if (!isInitialized || items.length === 0) {
+    return (
+      <div className="min-h-screen bg-background w-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading your order...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -323,64 +348,108 @@ const Checkout = () => {
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-1">
               <Card className="sticky top-4">
-                <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Package className="h-5 w-5" />
+                      Your Order
+                    </span>
+                    <Badge variant="secondary">{itemCount} items</Badge>
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Items */}
-                  <div className="space-y-3">
-                    {items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex gap-3 p-3 rounded-lg bg-muted/50"
-                      >
-                        <div className="w-16 h-16 rounded-md overflow-hidden bg-background flex-shrink-0">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-contain"
-                          />
+                  {/* Items with scroll area for many items */}
+                  <ScrollArea className="max-h-[300px] pr-4">
+                    <div className="space-y-3">
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex gap-3 p-3 rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 border"
+                        >
+                          <div className="w-20 h-20 rounded-lg overflow-hidden bg-white flex-shrink-0 shadow-sm">
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-full h-full object-contain p-1"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start gap-1">
+                              <p className="font-semibold text-sm leading-tight truncate">
+                                {item.name}
+                              </p>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-destructive hover:text-destructive flex-shrink-0"
+                                onClick={() => removeFromCart(item.id)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                            {item.category && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 mt-0.5">
+                                {item.category}
+                              </Badge>
+                            )}
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="flex items-center gap-1 border rounded-md bg-white">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                  disabled={item.quantity <= 1}
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                                <span className="w-6 text-center text-sm font-medium">
+                                  {item.quantity}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </div>
+                              <p className="text-sm font-bold text-primary">
+                                ₹{(item.price * item.quantity).toFixed(0)}
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">
-                            {item.name}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Qty: {item.quantity}
-                          </p>
-                          <p className="text-sm font-semibold">
-                            ₹{(item.price * item.quantity).toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
 
                   <Separator />
 
                   {/* Price Breakdown */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 bg-muted/30 rounded-lg p-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Subtotal</span>
-                      <span>₹{total.toFixed(2)}</span>
+                      <span className="text-muted-foreground">Subtotal ({itemCount} items)</span>
+                      <span className="font-medium">₹{total.toFixed(0)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Delivery Fee</span>
                       <span className="text-green-600 font-medium">FREE</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Tax</span>
-                      <span>₹0.00</span>
+                      <span className="text-muted-foreground">Tax (included)</span>
+                      <span>₹0</span>
                     </div>
                   </div>
 
                   <Separator />
 
                   {/* Total */}
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold">Total</span>
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl">
+                    <span className="text-lg font-semibold">Total Amount</span>
                     <span className="text-2xl font-bold text-primary">
-                      ₹{total.toFixed(2)}
+                      ₹{total.toFixed(0)}
                     </span>
                   </div>
 

@@ -78,6 +78,7 @@ interface Order {
   paymentMethod: string;
   totalAmount: number;
   orderStatus: string;
+  cancelledBy?: string | null;
   paymentStatus: string;
   createdAt: string;
   updatedAt: string;
@@ -258,6 +259,38 @@ const AdminDashboard = () => {
       fetchOrders();
     } catch (err: any) {
       toast.error(err.message || "Failed to update order status");
+    }
+  };
+
+  // -------------------------------
+  // Delete Order (Admin only)
+  // -------------------------------
+  const deleteOrder = async (orderId: string) => {
+    if (!confirm("Are you sure you want to delete this order? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/orders/${orderId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to delete order");
+      }
+
+      toast.success("Order deleted successfully");
+      fetchOrders();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete order");
     }
   };
 
@@ -565,7 +598,7 @@ const AdminDashboard = () => {
   // -------------------------------
   // Status Badge Colors
   // -------------------------------
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, cancelledBy?: string | null) => {
     const map: Record<
       string,
       { className: string; label: string; icon: any }
@@ -597,7 +630,7 @@ const AdminDashboard = () => {
       },
       cancelled: {
         className: "bg-red-100 text-red-800",
-        label: "Cancelled",
+        label: cancelledBy === "user" ? "Cancelled by User" : "Cancelled",
         icon: XCircle,
       },
     };
@@ -891,13 +924,14 @@ const AdminDashboard = () => {
                     <TableHead>Payment</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Action</TableHead>
+                    <TableHead>Delete</TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
                   {filteredOrders.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={9} className="text-center py-8">
                         <p className="text-muted-foreground">
                           No orders found.
                         </p>
@@ -911,13 +945,24 @@ const AdminDashboard = () => {
                         </TableCell>
 
                         <TableCell>
-                          <div>
-                            <p className="font-medium">
+                          <div className="space-y-1 min-w-[250px]">
+                            <p className="font-medium text-gray-900">
                               {order.shippingAddress.fullName}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {order.shippingAddress.phone}
+                              📞 {order.shippingAddress.phone}
                             </p>
+                            <p className="text-xs text-muted-foreground">
+                              ✉️ {order.shippingAddress.email}
+                            </p>
+                            <div className="text-xs text-muted-foreground">
+                              <p>📍 {order.shippingAddress.address}</p>
+                              <p className="pl-4">{order.shippingAddress.city}, {order.shippingAddress.state}</p>
+                              <p className="pl-4">PIN: {order.shippingAddress.pincode}</p>
+                              {order.shippingAddress.landmark && (
+                                <p className="pl-4 text-gray-500">Landmark: {order.shippingAddress.landmark}</p>
+                              )}
+                            </div>
                           </div>
                         </TableCell>
 
@@ -928,7 +973,7 @@ const AdminDashboard = () => {
                         </TableCell>
 
                         <TableCell>
-                          {getStatusBadge(order.orderStatus)}
+                          {getStatusBadge(order.orderStatus, order.cancelledBy)}
                         </TableCell>
 
                         <TableCell>
@@ -951,32 +996,53 @@ const AdminDashboard = () => {
                         </TableCell>
 
                         <TableCell>
-                          <Select
-                            value={order.orderStatus}
-                            onValueChange={(val) =>
-                              updateOrderStatus(order._id, val)
-                            }
+                          {order.cancelledBy === "user" ? (
+                            <div className="text-center">
+                              <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">
+                                User Cancelled
+                              </Badge>
+                              <p className="text-xs text-muted-foreground mt-1">Cannot modify</p>
+                            </div>
+                          ) : (
+                            <Select
+                              value={order.orderStatus}
+                              onValueChange={(val) =>
+                                updateOrderStatus(order._id, val)
+                              }
+                            >
+                              <SelectTrigger className="w-[130px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="confirmed">
+                                  Confirmed (Accept)
+                                </SelectItem>
+                                <SelectItem value="processing">
+                                  Processing
+                                </SelectItem>
+                                <SelectItem value="shipped">Shipped</SelectItem>
+                                <SelectItem value="delivered">
+                                  Delivered
+                                </SelectItem>
+                                <SelectItem value="cancelled">
+                                  Cancelled (Reject)
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </TableCell>
+
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => deleteOrder(order._id)}
+                            title="Delete Order"
                           >
-                            <SelectTrigger className="w-[130px]">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="confirmed">
-                                Confirmed (Accept)
-                              </SelectItem>
-                              <SelectItem value="processing">
-                                Processing
-                              </SelectItem>
-                              <SelectItem value="shipped">Shipped</SelectItem>
-                              <SelectItem value="delivered">
-                                Delivered
-                              </SelectItem>
-                              <SelectItem value="cancelled">
-                                Cancelled (Reject)
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                            <Trash className="h-4 w-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))
