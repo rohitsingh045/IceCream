@@ -1,6 +1,6 @@
 # 🍦 Namaste Bharat - Premium Ice Cream E-Commerce Platform
 
-![Namaste Bharat Homepage](docs/images/homepage.png)
+![https://github.com/rohitsingh045/IceCream/blob/main/public/image.png](docs/images/homepage.png)
 
 A full-stack e-commerce web application for **Namaste Bharat Ice Cream**, featuring authentic Indian flavors and premium ice cream products. Built with modern web technologies and deployed on Vercel.
 
@@ -332,7 +332,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Namaste Bharat Ice Cream**
 - Website: [https://namastebharat.vercel.app](https://namastebharat.vercel.app)
 - Email: rohitkumar40805@gmail.com
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: [https://github.com/rohitsingh045]
 
 ---
 
