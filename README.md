@@ -1,6 +1,6 @@
 # 🍦 Namaste Bharat - Premium Ice Cream E-Commerce Platform
 
-![https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image.png](https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image.png)
+![Namaste Bharat Homepage](https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image.png)
 
 A full-stack e-commerce web application for **Namaste Bharat Ice Cream**, featuring authentic Indian flavors and premium ice cream products. Built with modern web technologies and deployed on Vercel.
 
@@ -11,15 +11,15 @@ A full-stack e-commerce web application for **Namaste Bharat Ice Cream**, featur
 ## 📸 Screenshots
 
 ### Homepage
-![https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image.png](docs/images/homepage.png)
+![Homepage Hero](https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image.png)
 *Premium ice cream crafted with the finest ingredients and love*
 
 ### Our Special Flavors
-![https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image%20copy.png](docs/images/products.png)
+![Product Gallery](https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image%20copy.png)
 *Hand-picked favorites that bring the taste of India to your palate*
 
 ### Product Details
-![https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image%20copy%202.png](docs/images/product-detail.png)
+![Product Modal](https://raw.githubusercontent.com/rohitsingh045/IceCream/refs/heads/main/public/image%20copy%202.png)
 *Detailed product view with ratings, pricing, and cart functionality*
 
 ---
