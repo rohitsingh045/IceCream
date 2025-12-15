@@ -280,7 +280,7 @@ const Careers = () => {
                 </div>
                 <h3 className="font-bold text-foreground mb-2">Email Us</h3>
                 <a href="mailto:careers@namastebharat.com" className="text-primary hover:underline font-semibold break-all">
-                  careers@namastebharat.com
+                  raviinterprizes@namastebharat.com
                 </a>
               </div>
 
@@ -308,7 +308,7 @@ const Careers = () => {
             <div className="mt-10 text-center bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-8 border-2 border-yellow-300">
               <Clock className="w-12 h-12 text-orange-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-foreground mb-2">Office Timing</h3>
-              <p className="text-muted-foreground mb-4">Monday - Saturday: 10:00 AM - 6:00 PM</p>
+              <p className="text-muted-foreground mb-4">Monday - Sunday: 8:00 AM - 9:00 PM</p>
               <p className="text-sm text-muted-foreground italic">
                 Aap walk-in bhi kar sakte hain! Appointment ki zarurat nahi.
               </p>

@@ -513,7 +513,7 @@ const Home = () => {
                     </Button>
                   </div>
                   <p className="text-center text-xs text-muted-foreground">
-                    🎉 Free delivery on orders above ₹500
+                    {/* 🎉 Free delivery on orders above ₹500 */}
                   </p>
                 </div>
               </div>
