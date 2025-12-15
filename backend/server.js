@@ -14,7 +14,7 @@ connectDB();
 
 // CORS Configuration - MUST BE BEFORE ROUTES
 app.use(cors({
-  origin: ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'],
+  origin: ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000', 'https://namastebharat.vercel.app', 'https://ice-cream-hazel.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -71,9 +71,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
-  console.log(`📍 http://localhost:${PORT}`);
-});
+// Export for Vercel serverless
+module.exports = app;
+
+// Start server (only when running directly)
+if (require.main === module) {
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
+    console.log(`📍 http://localhost:${PORT}`);
+  });
+}
