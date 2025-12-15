@@ -23,6 +23,7 @@ import ProductCategories from "@/components/ProductCategories";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_URL } from "@/lib/api";
 
 // Import product images
 import kesarPistaKulfi from "@/assets/products/kesar-pista-kulfi.png";
@@ -123,7 +124,7 @@ const Home = () => {
   useEffect(() => {
     const fetchSpecials = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/products");
+        const res = await fetch(`${API_URL}/api/products`);
         const data = await res.json();
 
         if (!res.ok || !data.success) return;
@@ -174,7 +175,7 @@ const Home = () => {
       formData.append("image", file);
 
       const uploadRes = await fetch(
-        "http://localhost:5001/api/upload/product-image",
+        `${API_URL}/api/upload/product-image`,
         {
           method: "POST",
           headers: {
@@ -210,7 +211,7 @@ const Home = () => {
       };
 
       const res = await fetch(
-        `http://localhost:5001/api/products/admin/${editingProduct.productId}`,
+        `${API_URL}/api/products/admin/${editingProduct.productId}`,
         {
           method: "PUT",
           headers: {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { API_URL } from "@/lib/api";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -166,7 +167,7 @@ const AdminDashboard = () => {
     try {
       setIsLoading(true);
 
-      const res = await fetch("http://localhost:5001/api/orders/admin/all", {
+      const res = await fetch(`${API_URL}/api/orders/admin/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -191,7 +192,7 @@ const AdminDashboard = () => {
     try {
       setIsLoadingProducts(true);
 
-      const res = await fetch("http://localhost:5001/api/products");
+      const res = await fetch(`${API_URL}/api/products`);
       const data = await res.json();
 
       if (!res.ok || !data.success) {
@@ -236,7 +237,7 @@ const AdminDashboard = () => {
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/orders/${orderId}/status`,
+        `${API_URL}/api/orders/${orderId}/status`,
         {
           method: "PATCH",
           headers: {
@@ -288,7 +289,7 @@ const AdminDashboard = () => {
     try {
       setIsCreatingProduct(true);
       const res = await fetch(
-        "http://localhost:5001/api/products/admin/create",
+        `${API_URL}/api/products/admin/create`,
         {
           method: "POST",
           headers: {
@@ -346,7 +347,7 @@ const AdminDashboard = () => {
     try {
       setIsUploadingImage(true);
       const res = await fetch(
-        "http://localhost:5001/api/upload/product-image",
+        `${API_URL}/api/upload/product-image`,
         {
           method: "POST",
           headers: {
@@ -388,7 +389,7 @@ const AdminDashboard = () => {
       setUpdatingProductId(productId);
 
       const uploadRes = await fetch(
-        "http://localhost:5001/api/upload/product-image",
+        `${API_URL}/api/upload/product-image`,
         {
           method: "POST",
           headers: {
@@ -405,7 +406,7 @@ const AdminDashboard = () => {
       }
 
       const updateRes = await fetch(
-        `http://localhost:5001/api/products/admin/${productId}`,
+        `${API_URL}/api/products/admin/${productId}`,
         {
           method: "PUT",
           headers: {
@@ -441,7 +442,7 @@ const AdminDashboard = () => {
         "https://via.placeholder.com/400x300?text=Product+Image";
 
       const res = await fetch(
-        `http://localhost:5001/api/products/admin/${productId}`,
+        `${API_URL}/api/products/admin/${productId}`,
         {
           method: "PUT",
           headers: {
@@ -489,7 +490,7 @@ const AdminDashboard = () => {
       formData.append("image", file);
 
       const uploadRes = await fetch(
-        "http://localhost:5001/api/upload/product-image",
+        `${API_URL}/api/upload/product-image`,
         {
           method: "POST",
           headers: {
@@ -526,7 +527,7 @@ const AdminDashboard = () => {
       };
 
       const res = await fetch(
-        `http://localhost:5001/api/products/admin/${editingProduct._id}`,
+        `${API_URL}/api/products/admin/${editingProduct._id}`,
         {
           method: "PUT",
           headers: {

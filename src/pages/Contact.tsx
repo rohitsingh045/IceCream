@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { MapPin, Phone, Mail, Clock, Send, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { API_URL } from "@/lib/api";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -66,7 +67,7 @@ const Contact = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5001/api/contact",
+        `${API_URL}/api/contact`,
         formData
       );
 

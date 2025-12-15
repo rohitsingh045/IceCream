@@ -30,6 +30,7 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_URL } from "@/lib/api";
 
 import kesarPistaKulfi from "@/assets/products/kesar-pista-kulfi.png";
 import mangoKulfi from "@/assets/products/mango-kulfi.png";
@@ -230,7 +231,7 @@ const Menu = () => {
   useEffect(() => {
     const fetchMenuProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/products");
+        const res = await fetch(`${API_URL}/api/products`);
         const data = await res.json();
 
         if (!res.ok || !data.success) return;
@@ -285,7 +286,7 @@ const Menu = () => {
       const formData = new FormData();
       formData.append("image", file);
 
-      const uploadRes = await fetch("http://localhost:5001/api/upload/product-image", {
+      const uploadRes = await fetch(`${API_URL}/api/upload/product-image`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -319,7 +320,7 @@ const Menu = () => {
       };
 
       const res = await fetch(
-        `http://localhost:5001/api/products/admin/${editingProduct.productId}`,
+        `${API_URL}/api/products/admin/${editingProduct.productId}`,
         {
           method: "PUT",
           headers: {

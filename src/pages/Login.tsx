@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { API_URL } from "@/lib/api";
 
 const Login = () => {
   const { login } = useAuth();
@@ -24,7 +25,7 @@ const Login = () => {
     try {
       setIsSubmitting(true);
 
-      const res = await fetch("http://localhost:5001/api/users/login", {
+      const res = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

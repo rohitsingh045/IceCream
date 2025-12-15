@@ -17,6 +17,7 @@ import {
   CheckCircle,
   ArrowLeft,
 } from "lucide-react";
+import { API_URL } from "@/lib/api";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -86,7 +87,7 @@ const Checkout = () => {
         totalAmount: total,
       };
 
-      const response = await fetch("http://localhost:5001/api/orders", {
+      const response = await fetch(`${API_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

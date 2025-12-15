@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_URL } from "@/lib/api";
 
 import {
   Card,
@@ -68,7 +69,7 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:5001/api/users/admin/all", {
+      const res = await fetch(`${API_URL}/api/users/admin/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

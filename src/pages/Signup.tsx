@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Loader2, Mail, Lock, User, Phone, UserPlus, Eye, EyeOff } from "lucide-react";
+import { API_URL } from "@/lib/api";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5001/api/users/register", {
+      const res = await fetch(`${API_URL}/api/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
