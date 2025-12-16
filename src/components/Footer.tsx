@@ -164,8 +164,8 @@ const Footer = () => {
                 <div>
                   <p className="text-white/90 font-medium text-xs">Our Store</p>
                   <p className="text-white/70 text-xs leading-relaxed">
-                    Ravi Enterprizes and Namaste Bharat Ice Cream,<br />
-                    Konhwa more,Gopalganj<br />
+                    Ravi Enterprises & Namaste Bharat Ice Cream,<br />
+                    Konhwa More, Gopalganj<br />
                     Bihar 841428
                   </p>
                 </div>

@@ -103,8 +103,8 @@ const Contact = () => {
     {
       icon: <MapPin className="h-6 w-6" />,
       title: "Address",
-      details: "Ravi Enterprizes, Konhwa more, Gopalganj, Bihar 841428",
-      link: "https://maps.google.com",
+      details: "Ravi Enterprises, Konhwa More, Gopalganj, Bihar 841428",
+      link: "https://www.google.com/maps/search/Ravi+Enterprises+Konhwa+More+Gopalganj+Bihar",
     },
     {
       icon: <Phone className="h-6 w-6" />,
@@ -185,13 +185,14 @@ const Contact = () => {
             {/* Map */}
             <Card className="overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3602.4654080156487!2d84.43!3d26.47!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDI4JzEyLjAiTiA4NMKwMjUnNDguMCJF!5e0!3m2!1sen!2sin!4v1234567890"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3602.5!2d84.4057!3d26.4748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRavi%20Enterprises%2C%20Konhwa%20More%2C%20Gopalganj!5e0!3m2!1sen!2sin!4v1702734000000"
                 width="100%"
                 height="300"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
+                title="Ravi Enterprises, Konhwa More, Gopalganj, Bihar"
               ></iframe>
             </Card>
           </div>
