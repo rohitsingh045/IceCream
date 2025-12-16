@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -24,10 +24,13 @@ import {
   Clock,
   Truck,
   XCircle,
-  IndianRupee,
-  User,
   Mail,
   Phone,
+  IceCream,
+  Sparkles,
+  Heart,
+  Star,
+  Gift,
 } from "lucide-react";
 import { API_URL } from "@/lib/api";
 
@@ -119,7 +122,6 @@ const Account = () => {
 
       if (response.ok && data.success) {
         toast.success("Order cancelled successfully");
-        // Update the order in local state
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
             order._id === orderId
@@ -144,6 +146,8 @@ const Account = () => {
         return <Clock className="h-4 w-4" />;
       case "processing":
         return <Package className="h-4 w-4" />;
+      case "confirmed":
+        return <CheckCircle className="h-4 w-4" />;
       case "shipped":
         return <Truck className="h-4 w-4" />;
       case "delivered":
@@ -158,30 +162,32 @@ const Account = () => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+        return "bg-amber-100 text-amber-700 border-amber-300";
       case "processing":
-        return "bg-blue-100 text-blue-800 border-blue-300";
+        return "bg-blue-100 text-blue-700 border-blue-300";
+      case "confirmed":
+        return "bg-emerald-100 text-emerald-700 border-emerald-300";
       case "shipped":
-        return "bg-purple-100 text-purple-800 border-purple-300";
+        return "bg-purple-100 text-purple-700 border-purple-300";
       case "delivered":
-        return "bg-green-100 text-green-800 border-green-300";
+        return "bg-green-100 text-green-700 border-green-300";
       case "cancelled":
-        return "bg-red-100 text-red-800 border-red-300";
+        return "bg-red-100 text-red-700 border-red-300";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
+        return "bg-gray-100 text-gray-700 border-gray-300";
     }
   };
 
   const getPaymentStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "paid":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-700";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-amber-100 text-amber-700";
       case "failed":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-700";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-700";
     }
   };
 
@@ -197,246 +203,370 @@ const Account = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-cyan-100 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading your account...</p>
+          <div className="relative">
+            <IceCream className="h-16 w-16 text-pink-500 mx-auto mb-4 animate-bounce" />
+            <Sparkles className="h-6 w-6 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
+          </div>
+          <p className="text-pink-600 font-medium">Loading your sweet journey...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Profile Section */}
-        <Card className="mb-8 overflow-hidden">
-          <div className="bg-gradient-to-r from-primary via-secondary to-accent p-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20 ring-4 ring-white/50 shadow-xl">
-                <AvatarFallback className="bg-white text-primary text-2xl font-bold">
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-white">
-                <h1 className="text-2xl font-bold">{user?.name}</h1>
-                <div className="flex items-center gap-2 mt-1 opacity-90">
-                  <Mail className="h-4 w-4" />
-                  <span className="text-sm">{user?.email}</span>
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-cyan-100 relative overflow-hidden">
+      {/* Full Screen Ice Cream Background Pattern */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Large decorative ice cream images */}
+        <img 
+          src="https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=300&q=80" 
+          alt="" 
+          className="absolute -top-10 -left-10 w-48 h-48 object-cover rounded-full opacity-20 blur-sm"
+        />
+        <img 
+          src="https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=300&q=80" 
+          alt="" 
+          className="absolute top-20 -right-10 w-56 h-56 object-cover rounded-full opacity-15 blur-sm"
+        />
+        <img 
+          src="https://images.unsplash.com/photo-1629385701021-fcd568a743e8?w=300&q=80" 
+          alt="" 
+          className="absolute top-1/3 -left-16 w-44 h-44 object-cover rounded-full opacity-20 blur-sm"
+        />
+        <img 
+          src="https://images.unsplash.com/photo-1560008581-09826d1de69e?w=300&q=80" 
+          alt="" 
+          className="absolute top-1/2 -right-12 w-52 h-52 object-cover rounded-full opacity-15 blur-sm"
+        />
+        <img 
+          src="https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=300&q=80" 
+          alt="" 
+          className="absolute bottom-1/3 -left-8 w-40 h-40 object-cover rounded-full opacity-20 blur-sm"
+        />
+        <img 
+          src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300&q=80" 
+          alt="" 
+          className="absolute bottom-20 -right-16 w-48 h-48 object-cover rounded-full opacity-15 blur-sm"
+        />
+        <img 
+          src="https://images.unsplash.com/photo-1488900128323-21503983a07e?w=300&q=80" 
+          alt="" 
+          className="absolute -bottom-10 left-1/4 w-44 h-44 object-cover rounded-full opacity-20 blur-sm"
+        />
+        <img 
+          src="https://images.unsplash.com/photo-1567206563064-6f60f40a2b57?w=300&q=80" 
+          alt="" 
+          className="absolute bottom-1/4 right-1/4 w-36 h-36 object-cover rounded-full opacity-10 blur-sm"
+        />
+        
+        {/* Colorful blur circles */}
+        <div className="absolute top-20 left-10 w-64 h-64 bg-pink-300/40 rounded-full blur-3xl" />
+        <div className="absolute top-40 right-20 w-72 h-72 bg-purple-300/30 rounded-full blur-3xl" />
+        <div className="absolute bottom-40 left-1/4 w-80 h-80 bg-cyan-300/30 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-1/3 w-56 h-56 bg-yellow-300/30 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-200/20 rounded-full blur-3xl" />
+        
+        {/* Floating Ice Cream Emojis - scattered across screen */}
+        <div className="absolute top-[5%] left-[2%] text-7xl opacity-30">🍦</div>
+        <div className="absolute top-[8%] right-[3%] text-8xl opacity-25">🍨</div>
+        <div className="absolute top-[20%] left-[85%] text-6xl opacity-30">🍧</div>
+        <div className="absolute top-[35%] left-[1%] text-7xl opacity-25">🍨</div>
+        <div className="absolute top-[45%] right-[2%] text-8xl opacity-30">🍦</div>
+        <div className="absolute top-[60%] left-[3%] text-6xl opacity-25">🧁</div>
+        <div className="absolute top-[75%] right-[1%] text-7xl opacity-30">🍧</div>
+        <div className="absolute top-[85%] left-[2%] text-8xl opacity-25">🍦</div>
+        <div className="absolute bottom-[5%] right-[4%] text-6xl opacity-30">🍨</div>
+        <div className="absolute top-[15%] left-[90%] text-5xl opacity-20">🍦</div>
+        <div className="absolute top-[55%] left-[92%] text-6xl opacity-25">🍧</div>
+        <div className="absolute bottom-[25%] left-[1%] text-7xl opacity-20">🍨</div>
+      </div>
+
+      <div className="relative z-10 py-8 px-4">
+        <div className="container mx-auto max-w-4xl">
+          {/* Profile Header Card */}
+          <Card className="mb-8 overflow-hidden border-0 shadow-2xl bg-white/90 backdrop-blur-md">
+            {/* Gradient Header with Pattern */}
+            <div className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 p-8 overflow-hidden">
+              {/* Decorative circles */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-20 w-24 h-24 bg-white/10 rounded-full translate-y-1/2" />
+              <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-white/10 rounded-full" />
+              
+              {/* Profile Content */}
+              <div className="relative flex flex-col sm:flex-row items-center gap-6">
+                <div className="relative">
+                  <Avatar className="h-24 w-24 ring-4 ring-white shadow-2xl">
+                    <AvatarFallback className="bg-gradient-to-br from-pink-200 to-purple-200 text-pink-600 text-3xl font-bold">
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1.5 shadow-lg">
+                    <IceCream className="h-5 w-5 text-pink-500" />
+                  </div>
+                </div>
+                <div className="text-center sm:text-left text-white">
+                  <h1 className="text-3xl font-bold drop-shadow-lg">{user?.name}</h1>
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 opacity-90">
+                    <Mail className="h-4 w-4" />
+                    <span className="text-sm">{user?.email}</span>
+                  </div>
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
+                    <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                      <Heart className="h-3 w-3 mr-1 fill-current" />
+                      Ice Cream Lover
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Card>
-
-        {/* Order History Section */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <ShoppingBag className="h-6 w-6 text-primary" />
-            My Orders
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            View and track all your previous orders
-          </p>
-        </div>
-
-        {orders.length === 0 ? (
-          <Card className="text-center py-16">
-            <CardContent>
-              <ShoppingBag className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No orders yet
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                You haven't placed any orders yet. Start exploring our delicious ice creams!
-              </p>
-              <Button
-                onClick={() => navigate("/menu")}
-                className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-              >
-                <Package className="h-4 w-4 mr-2" />
-                Browse Products
-              </Button>
-            </CardContent>
           </Card>
-        ) : (
-          <div className="space-y-4">
-            <Accordion type="single" collapsible className="space-y-4">
-              {orders.map((order) => (
-                <AccordionItem
-                  key={order._id}
-                  value={order._id}
-                  className="bg-white rounded-xl shadow-md border-0 overflow-hidden"
-                >
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 w-full text-left">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-primary/10 p-2 rounded-lg">
-                          <Package className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-900">
-                            Order #{order.orderNumber || order._id.slice(-8).toUpperCase()}
-                          </p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(order.createdAt)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 sm:ml-auto">
-                        <Badge
-                          variant="outline"
-                          className={`${getStatusColor(order.orderStatus)} flex items-center gap-1`}
-                        >
-                          {getStatusIcon(order.orderStatus)}
-                          {order.orderStatus}
-                        </Badge>
-                        <span className="font-bold text-primary">
-                          ₹{order.totalAmount.toFixed(0)}
-                        </span>
-                      </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-6 pb-6">
-                    <Separator className="mb-4" />
 
-                    {/* Order Items */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <ShoppingBag className="h-4 w-4 text-primary" />
-                        Items Ordered
-                      </h4>
-                      <div className="space-y-3">
-                        {order.items.map((item, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-4 bg-gray-50 rounded-lg p-3"
-                          >
-                            {item.image ? (
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                className="w-14 h-14 rounded-lg object-cover"
-                              />
-                            ) : (
-                              <div className="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <Package className="h-6 w-6 text-primary" />
-                              </div>
-                            )}
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{item.name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Qty: {item.quantity} × ₹{item.price}
-                              </p>
-                            </div>
-                            <p className="font-semibold text-primary">
-                              ₹{(item.quantity * item.price).toFixed(0)}
+          {/* Order History Section */}
+          <div className="mb-6 flex items-center gap-3">
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-pink-400 to-purple-500 shadow-lg">
+              <ShoppingBag className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                My Orders
+              </h2>
+              <p className="text-gray-500 text-sm">
+                Track your delicious ice cream orders 🍦
+              </p>
+            </div>
+          </div>
+
+          {orders.length === 0 ? (
+            <Card className="text-center py-16 border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-50/50 to-purple-50/50" />
+              <CardContent className="relative">
+                <div className="relative inline-block mb-6">
+                  <IceCream className="h-24 w-24 text-pink-300 mx-auto" />
+                  <Sparkles className="h-8 w-8 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
+                </div>
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-3">
+                  No orders yet!
+                </h3>
+                <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                  Your ice cream adventure awaits! Explore our delicious flavors and treat yourself to something sweet 🍨
+                </p>
+                <Button
+                  onClick={() => navigate("/menu")}
+                  className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:opacity-90 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <IceCream className="h-5 w-5 mr-2" />
+                  Explore Ice Creams
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              <Accordion type="single" collapsible className="space-y-4">
+                {orders.map((order, orderIndex) => (
+                  <AccordionItem
+                    key={order._id}
+                    value={order._id}
+                    className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-0 overflow-hidden hover:shadow-xl transition-all duration-300"
+                  >
+                    <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-gradient-to-r hover:from-pink-50/50 hover:to-purple-50/50 transition-all">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full text-left">
+                        <div className="flex items-center gap-4">
+                          {/* Order Icon with gradient */}
+                          <div className={`p-3 rounded-xl shadow-md ${
+                            orderIndex % 3 === 0 
+                              ? 'bg-gradient-to-br from-pink-400 to-pink-500' 
+                              : orderIndex % 3 === 1 
+                                ? 'bg-gradient-to-br from-purple-400 to-purple-500'
+                                : 'bg-gradient-to-br from-cyan-400 to-cyan-500'
+                          }`}>
+                            <Package className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-800">
+                              Order #{order.orderNumber || order._id.slice(-8).toUpperCase()}
+                            </p>
+                            <p className="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                              <Calendar className="h-3.5 w-3.5" />
+                              {formatDate(order.createdAt)}
                             </p>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {/* Shipping Address */}
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-primary" />
-                          Shipping Address
-                        </h4>
-                        <div className="text-sm text-muted-foreground space-y-1">
-                          <p className="font-medium text-gray-900">
-                            {order.shippingAddress.fullName}
-                          </p>
-                          <p>{order.shippingAddress.address}</p>
-                          <p>
-                            {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-                            {order.shippingAddress.pincode}
-                          </p>
-                          <p className="flex items-center gap-1 pt-1">
-                            <Phone className="h-3 w-3" />
-                            {order.shippingAddress.phone}
-                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 sm:ml-auto">
+                          <Badge
+                            variant="outline"
+                            className={`${getStatusColor(order.orderStatus)} flex items-center gap-1.5 px-3 py-1 rounded-full font-medium`}
+                          >
+                            {getStatusIcon(order.orderStatus)}
+                            {order.orderStatus}
+                          </Badge>
+                          <span className="font-bold text-lg bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                            ₹{order.totalAmount.toFixed(0)}
+                          </span>
                         </div>
                       </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-6">
+                      <Separator className="mb-5 bg-gradient-to-r from-pink-200 via-purple-200 to-cyan-200" />
 
-                      {/* Payment Info */}
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                          <CreditCard className="h-4 w-4 text-primary" />
-                          Payment Details
-                        </h4>
-                        <div className="text-sm space-y-2">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Method</span>
-                            <span className="font-medium capitalize">
-                              {order.paymentMethod}
-                            </span>
+                      {/* Order Items */}
+                      <div className="mb-6">
+                        <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                          <div className="p-1.5 rounded-lg bg-pink-100">
+                            <IceCream className="h-4 w-4 text-pink-500" />
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Status</span>
-                            <Badge
-                              variant="secondary"
-                              className={getPaymentStatusColor(order.paymentStatus)}
+                          Items Ordered
+                        </h4>
+                        <div className="space-y-3">
+                          {order.items.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-4 bg-gradient-to-r from-pink-50/50 to-purple-50/50 rounded-xl p-4 border border-pink-100/50"
                             >
-                              {order.paymentStatus}
-                            </Badge>
+                              {item.image ? (
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-16 h-16 rounded-xl object-cover shadow-md"
+                                />
+                              ) : (
+                                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center shadow-md">
+                                  <IceCream className="h-8 w-8 text-pink-500" />
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-800">{item.name}</p>
+                                <p className="text-sm text-gray-500">
+                                  Qty: {item.quantity} × ₹{item.price}
+                                </p>
+                              </div>
+                              <p className="font-bold text-pink-600 text-lg">
+                                ₹{(item.quantity * item.price).toFixed(0)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {/* Shipping Address */}
+                        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-5 border border-blue-100/50">
+                          <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <div className="p-1.5 rounded-lg bg-blue-100">
+                              <MapPin className="h-4 w-4 text-blue-500" />
+                            </div>
+                            Shipping Address
+                          </h4>
+                          <div className="text-sm text-gray-600 space-y-1.5">
+                            <p className="font-semibold text-gray-800">
+                              {order.shippingAddress.fullName}
+                            </p>
+                            <p>{order.shippingAddress.address}</p>
+                            <p>
+                              {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                              {order.shippingAddress.pincode}
+                            </p>
+                            <p className="flex items-center gap-1.5 pt-1 text-blue-600">
+                              <Phone className="h-3.5 w-3.5" />
+                              {order.shippingAddress.phone}
+                            </p>
                           </div>
-                          <Separator />
-                          <div className="flex justify-between pt-1">
-                            <span className="font-semibold text-gray-900">Total</span>
-                            <span className="font-bold text-primary text-lg">
-                              ₹{order.totalAmount.toFixed(0)}
-                            </span>
+                        </div>
+
+                        {/* Payment Info */}
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100/50">
+                          <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <div className="p-1.5 rounded-lg bg-green-100">
+                              <CreditCard className="h-4 w-4 text-green-500" />
+                            </div>
+                            Payment Details
+                          </h4>
+                          <div className="text-sm space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-500">Method</span>
+                              <span className="font-semibold capitalize text-gray-800 bg-gray-100 px-3 py-1 rounded-full text-xs">
+                                {order.paymentMethod}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-500">Status</span>
+                              <Badge
+                                variant="secondary"
+                                className={`${getPaymentStatusColor(order.paymentStatus)} rounded-full`}
+                              >
+                                {order.paymentStatus}
+                              </Badge>
+                            </div>
+                            <Separator className="my-2" />
+                            <div className="flex justify-between items-center pt-1">
+                              <span className="font-semibold text-gray-800">Total</span>
+                              <span className="font-bold text-xl bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                                ₹{order.totalAmount.toFixed(0)}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Cancel Button - Only show for pending orders */}
-                    {order.orderStatus.toLowerCase() === "pending" && (
-                      <div className="mt-6 pt-4 border-t border-gray-200">
-                        <Button
-                          variant="outline"
-                          className="w-full sm:w-auto border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
-                          onClick={() => handleCancelOrder(order._id)}
-                          disabled={cancellingOrderId === order._id}
-                        >
-                          {cancellingOrderId === order._id ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Cancelling...
-                            </>
-                          ) : (
-                            <>
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Cancel Order
-                            </>
-                          )}
-                        </Button>
-                        <p className="text-xs text-muted-foreground mt-2">
-                          You can cancel this order before it's confirmed by admin
-                        </p>
-                      </div>
-                    )}
+                      {/* Cancel Button - Only show for pending orders */}
+                      {order.orderStatus.toLowerCase() === "pending" && (
+                        <div className="mt-6 pt-5 border-t border-gray-200">
+                          <Button
+                            variant="outline"
+                            className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 rounded-full px-6"
+                            onClick={() => handleCancelOrder(order._id)}
+                            disabled={cancellingOrderId === order._id}
+                          >
+                            {cancellingOrderId === order._id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Cancelling...
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Cancel Order
+                              </>
+                            )}
+                          </Button>
+                          <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            You can cancel before admin confirms
+                          </p>
+                        </div>
+                      )}
 
-                    {/* Show message for confirmed orders */}
-                    {order.orderStatus.toLowerCase() !== "pending" && 
-                     order.orderStatus.toLowerCase() !== "cancelled" && (
-                      <div className="mt-6 pt-4 border-t border-gray-200">
-                        <p className="text-sm text-muted-foreground flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                          This order has been confirmed and cannot be cancelled
-                        </p>
-                      </div>
-                    )}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-        )}
+                      {/* Show message for confirmed orders */}
+                      {order.orderStatus.toLowerCase() !== "pending" && 
+                       order.orderStatus.toLowerCase() !== "cancelled" && (
+                        <div className="mt-6 pt-5 border-t border-gray-200">
+                          <div className="flex items-center gap-2 text-sm text-emerald-600 bg-emerald-50 px-4 py-3 rounded-xl">
+                            <CheckCircle className="h-5 w-5" />
+                            <span className="font-medium">Order confirmed! Cannot be cancelled.</span>
+                          </div>
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          )}
+
+          {/* Bottom CTA */}
+          {orders.length > 0 && (
+            <div className="mt-8 text-center">
+              <Button
+                onClick={() => navigate("/menu")}
+                className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:opacity-90 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <IceCream className="h-5 w-5 mr-2" />
+                Order More Ice Cream
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -48,6 +48,11 @@ import {
   Loader2,
   Trash,
   Upload,
+  IceCream,
+  Sparkles,
+  Star,
+  Crown,
+  Package,
 } from "lucide-react";
 
 interface OrderItem {
@@ -661,10 +666,13 @@ const AdminDashboard = () => {
   // -------------------------------
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center w-full">
+      <div className="min-h-screen flex items-center justify-center w-full bg-gradient-to-br from-pink-100 via-purple-50 to-cyan-100">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
-          <p className="mt-3 text-muted-foreground">
+          <div className="relative">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-pink-500" />
+            <IceCream className="h-6 w-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-pink-600" />
+          </div>
+          <p className="mt-4 text-pink-600 font-medium">
             Loading admin dashboard...
           </p>
         </div>
@@ -676,27 +684,58 @@ const AdminDashboard = () => {
   // JSX Return
   // -------------------------------
   return (
-    <div className="min-h-screen w-full bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen w-full bg-gradient-to-br from-pink-100 via-purple-50 to-cyan-100 relative overflow-hidden">
+      {/* Floating Ice Cream Decorations */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-10 left-10 text-6xl animate-bounce opacity-30" style={{ animationDuration: '3s' }}>🍦</div>
+        <div className="absolute top-20 right-20 text-5xl animate-bounce opacity-25" style={{ animationDuration: '4s', animationDelay: '1s' }}>🍨</div>
+        <div className="absolute bottom-20 left-20 text-7xl animate-bounce opacity-20" style={{ animationDuration: '5s', animationDelay: '2s' }}>🍧</div>
+        <div className="absolute bottom-40 right-10 text-4xl animate-bounce opacity-30" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🧁</div>
+        <div className="absolute top-1/3 left-1/4 text-5xl animate-pulse opacity-20" style={{ animationDuration: '4s' }}>🍩</div>
+        <div className="absolute top-1/2 right-1/3 text-6xl animate-pulse opacity-25" style={{ animationDuration: '3s' }}>🎂</div>
+        <div className="absolute bottom-1/3 left-1/2 text-4xl animate-bounce opacity-20" style={{ animationDuration: '4.5s' }}>🍰</div>
+        <div className="absolute top-2/3 right-1/4 text-5xl animate-pulse opacity-25" style={{ animationDuration: '5s' }}>🍭</div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8 relative z-10">
         {/* HEADER */}
-        <div className="mb-8 flex flex-col gap-2">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage all customer orders – accept, reject, and track status.
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="p-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl shadow-lg">
+              <Crown className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
+              Admin Dashboard
+            </h1>
+            <div className="p-3 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl shadow-lg">
+              <IceCream className="h-8 w-8 text-white" />
+            </div>
+          </div>
+          <p className="text-gray-600 flex items-center justify-center gap-2">
+            <Sparkles className="h-4 w-4 text-yellow-500" />
+            Manage all customer orders – accept, reject, and track status
+            <Sparkles className="h-4 w-4 text-yellow-500" />
           </p>
         </div>
 
         {/* ADD PRODUCT (ADMIN ONLY) - LEFT SECTION */}
         <div className="mb-8">
           {!showProductForm ? (
-            <Button onClick={() => setShowProductForm(true)}>
+            <Button 
+              onClick={() => setShowProductForm(true)}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
               Add Product
             </Button>
           ) : (
             <div className="max-w-xl">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Add New Product</CardTitle>
+              <Card className="backdrop-blur-sm bg-white/70 border-0 shadow-xl rounded-3xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white">
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    Add New Product
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form
@@ -814,11 +853,16 @@ const AdminDashboard = () => {
                         type="button"
                         variant="outline"
                         onClick={() => setShowProductForm(false)}
+                        className="rounded-xl border-pink-200"
                       >
                         Cancel
                       </Button>
-                      <Button type="submit" disabled={isCreatingProduct}>
-                        {isCreatingProduct ? "Adding..." : "Add Product"}
+                      <Button 
+                        type="submit" 
+                        disabled={isCreatingProduct}
+                        className="rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                      >
+                        {isCreatingProduct ? "Adding..." : "Add Product 🍦"}
                       </Button>
                     </div>
                   </form>
@@ -830,57 +874,69 @@ const AdminDashboard = () => {
 
         {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
+          <Card className="backdrop-blur-sm bg-gradient-to-br from-blue-100 to-blue-50 border-0 shadow-lg rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-blue-700">Total Orders</CardTitle>
+              <div className="p-2 bg-blue-500 rounded-xl">
+                <ShoppingCart className="h-4 w-4 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalOrders}</div>
+              <div className="text-3xl font-bold text-blue-600">{stats.totalOrders}</div>
+              <p className="text-xs text-blue-500 mt-1">All time orders 🍦</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="backdrop-blur-sm bg-gradient-to-br from-amber-100 to-orange-50 border-0 shadow-lg rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-amber-700">Pending Orders</CardTitle>
+              <div className="p-2 bg-amber-500 rounded-xl">
+                <Clock className="h-4 w-4 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.pending}</div>
+              <div className="text-3xl font-bold text-amber-600">{stats.pending}</div>
+              <p className="text-xs text-amber-500 mt-1">Awaiting action ⏳</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="backdrop-blur-sm bg-gradient-to-br from-green-100 to-emerald-50 border-0 shadow-lg rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Confirmed Orders</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-green-700">Confirmed Orders</CardTitle>
+              <div className="p-2 bg-green-500 rounded-xl">
+                <CheckCircle2 className="h-4 w-4 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.confirmed}</div>
+              <div className="text-3xl font-bold text-green-600">{stats.confirmed}</div>
+              <p className="text-xs text-green-500 mt-1">Ready to process ✅</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="backdrop-blur-sm bg-gradient-to-br from-pink-100 to-purple-50 border-0 shadow-lg rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-pink-700">Total Revenue</CardTitle>
+              <div className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl">
+                <TrendingUp className="h-4 w-4 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹{stats.revenue.toFixed(2)}</div>
+              <div className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">₹{stats.revenue.toFixed(2)}</div>
+              <p className="text-xs text-pink-500 mt-1">Sweet earnings 💰</p>
             </CardContent>
           </Card>
         </div>
 
         {/* FILTERS */}
-        <Card className="mb-6">
+        <Card className="mb-6 backdrop-blur-sm bg-white/70 border-0 shadow-lg rounded-3xl overflow-hidden">
           <CardContent className="pt-6 flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
               <Input
                 placeholder="Search by order ID, name, email, or phone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-white/80 border-pink-200 focus:border-pink-400 rounded-xl"
               />
             </div>
 
@@ -888,27 +944,31 @@ const AdminDashboard = () => {
               value={statusFilter}
               onValueChange={(val) => setStatusFilter(val)}
             >
-              <SelectTrigger className="w-full md:w-[220px]">
-                <Filter className="h-4 w-4 mr-2" />
+              <SelectTrigger className="w-full md:w-[220px] bg-white/80 border-purple-200 rounded-xl">
+                <Filter className="h-4 w-4 mr-2 text-purple-400" />
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Orders</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="all">🍦 All Orders</SelectItem>
+                <SelectItem value="pending">⏳ Pending</SelectItem>
+                <SelectItem value="confirmed">✅ Confirmed</SelectItem>
+                <SelectItem value="processing">🔄 Processing</SelectItem>
+                <SelectItem value="shipped">🚚 Shipped</SelectItem>
+                <SelectItem value="delivered">🎉 Delivered</SelectItem>
+                <SelectItem value="cancelled">❌ Cancelled</SelectItem>
               </SelectContent>
             </Select>
           </CardContent>
         </Card>
 
         {/* ORDERS TABLE */}
-        <Card>
-          <CardHeader>
-            <CardTitle>All Orders ({filteredOrders.length})</CardTitle>
+        <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white">
+            <CardTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5" />
+              All Orders ({filteredOrders.length})
+              <Star className="h-4 w-4 text-yellow-300" />
+            </CardTitle>
           </CardHeader>
 
           <CardContent>
@@ -931,9 +991,13 @@ const AdminDashboard = () => {
                 <TableBody>
                   {filteredOrders.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8">
-                        <p className="text-muted-foreground">
-                          No orders found.
+                      <TableCell colSpan={9} className="text-center py-12">
+                        <IceCream className="h-12 w-12 mx-auto text-pink-300 mb-3" />
+                        <p className="text-gray-500 text-lg">
+                          No orders found 🍦
+                        </p>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Try adjusting your search or filter
                         </p>
                       </TableCell>
                     </TableRow>
@@ -1055,25 +1119,36 @@ const AdminDashboard = () => {
 
         {/* MANAGE PRODUCT IMAGES (ADMIN ONLY) */}
         <div className="mt-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Manage Product Images</h2>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl">
+                <IceCream className="h-5 w-5 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                Manage Product Images
+              </h2>
+            </div>
             {isLoadingProducts && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-pink-500 flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Loading products...
               </span>
             )}
           </div>
 
           {products.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No products found. Add a product above to get started.
-            </p>
+            <div className="text-center py-12 bg-white/60 backdrop-blur-sm rounded-3xl shadow-lg">
+              <IceCream className="h-16 w-16 mx-auto text-pink-300 mb-4" />
+              <p className="text-lg text-gray-500">
+                No products found. Add a product above to get started! 🍦
+              </p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.map((product) => (
                 <Card
                   key={product._id}
-                  className="group relative overflow-hidden rounded-3xl border-0 shadow-sm bg-gradient-to-br from-pink-50 via-white to-blue-50"
+                  className="group relative overflow-hidden rounded-3xl border-0 shadow-lg bg-gradient-to-br from-pink-50 via-white to-blue-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                 >
                   <div
                     className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white/40 cursor-pointer"
@@ -1121,11 +1196,14 @@ const AdminDashboard = () => {
 
       {/* Edit Modal */}
       <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg bg-gradient-to-br from-pink-50 via-white to-purple-50 border-0 rounded-3xl">
           <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
-            <DialogDescription>
-              Update the image, category, description, and price. Changes apply instantly.
+            <DialogTitle className="flex items-center gap-2 text-pink-600">
+              <IceCream className="h-5 w-5" />
+              Edit Product
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Update the image, category, description, and price. Changes apply instantly. ✨
             </DialogDescription>
           </DialogHeader>
 
@@ -1199,11 +1277,16 @@ const AdminDashboard = () => {
                   variant="outline"
                   onClick={() => setEditingProduct(null)}
                   disabled={isSavingEdit}
+                  className="rounded-xl border-pink-200"
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleSaveEdit} disabled={isSavingEdit}>
-                  {isSavingEdit ? "Saving..." : "Save"}
+                <Button 
+                  onClick={handleSaveEdit} 
+                  disabled={isSavingEdit}
+                  className="rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                >
+                  {isSavingEdit ? "Saving..." : "Save ✨"}
                 </Button>
               </DialogFooter>
             </div>
