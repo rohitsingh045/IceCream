@@ -58,7 +58,7 @@ const Home = () => {
       id: "kesar-pista-home",
       name: "Kesar Pista Kulfi",
       description: "Royal saffron with crunchy pistachios",
-      
+      price: 60,
       category: "Featured",
       image: kesarPistaKulfi,
     },
@@ -66,7 +66,7 @@ const Home = () => {
       id: "mango-kulfi-home",
       name: "Mango Kulfi",
       description: "Authentic Indian mango delight",
-     
+      price: 50,
       category: "Featured",
       image: mangoKulfi,
     },
@@ -74,7 +74,7 @@ const Home = () => {
       id: "rose-kulfi-home",
       name: "Rose Kulfi",
       description: "Fragrant rose flavored kulfi",
-      
+      price: 50,
       category: "Featured",
       image: roseKulfi,
     },
@@ -82,7 +82,7 @@ const Home = () => {
       id: "chocolate-cone-home",
       name: "Chocolate Cone",
       description: "Classic chocolate with real chocolate chips",
-      
+      price: 40,
       category: "Featured",
       image: chocolateCone,
     },
@@ -90,7 +90,7 @@ const Home = () => {
       id: "butterscotch-cone-home",
       name: "Butterscotch Cone",
       description: "Creamy butterscotch with caramel sauce",
-      
+      price: 40,
       category: "Featured",
       image: butterscotchCone,
     },
@@ -98,7 +98,7 @@ const Home = () => {
       id: "strawberry-cone-home",
       name: "Strawberry Cone",
       description: "Fresh strawberry ice cream delight",
-      
+      price: 35,
       category: "Featured",
       image: strawberryCone,
     },
@@ -106,7 +106,7 @@ const Home = () => {
       id: "vanilla-cone-home",
       name: "Vanilla Cone",
       description: "Pure vanilla bean ice cream",
-      
+      price: 30,
       category: "Featured",
       image: vanillaCone,
     },
@@ -114,7 +114,7 @@ const Home = () => {
       id: "pista-kulfi-home",
       name: "Pista Kulfi",
       description: "Rich pistachio flavored kulfi",
-      
+      price: 55,
       category: "Featured",
       image: pistaKulfi,
     },
