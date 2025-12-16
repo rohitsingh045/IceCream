@@ -86,7 +86,6 @@ const Account = () => {
         throw new Error(data.message || "Failed to fetch orders");
       }
     } catch (error) {
-      console.error("Fetch orders error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to load orders");
     } finally {
       setIsLoading(false);
@@ -133,7 +132,6 @@ const Account = () => {
         throw new Error(data.message || "Failed to cancel order");
       }
     } catch (error) {
-      console.error("Cancel order error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to cancel order");
     } finally {
       setCancellingOrderId(null);

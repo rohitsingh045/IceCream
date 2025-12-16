@@ -86,7 +86,6 @@ const Signup = () => {
       // Navigate after successful registration
       navigate("/");
     } catch (error: any) {
-      console.error("Registration failed:", error);
       // Error toast is already shown in AuthContext
     } finally {
       setIsLoading(false);

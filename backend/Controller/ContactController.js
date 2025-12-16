@@ -29,7 +29,6 @@ const submitContactForm = async (req, res) => {
       message: "Message sent successfully",
     });
   } catch (err) {
-    console.error("Contact form error:", err);
     res
       .status(500)
       .json({ success: false, message: "Failed to send message" });

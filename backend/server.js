@@ -24,12 +24,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  next();
-});
-
 // Routes
 const userRoutes = require("./Routes/userRoutes");
 const contactRoutes = require("./Routes/contactRoutes");
@@ -63,7 +57,6 @@ app.use((req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error("Error:", err);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal server error",
@@ -78,7 +71,6 @@ module.exports = app;
 if (require.main === module) {
   const PORT = process.env.PORT || 5001;
   app.listen(PORT, () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
-    console.log(`📍 http://localhost:${PORT}`);
+    // Server started
   });
 }

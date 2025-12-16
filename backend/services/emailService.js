@@ -20,12 +20,11 @@ if (
     },
   });
 } else {
-  console.log("ℹ️ Email service not configured. Emails will not be sent.");
+  // Email service not configured
 }
 
 async function sendEmail({ to, subject, html }) {
   if (!transporter) {
-    console.log("📧 [DEV] Email not sent (no transporter):", { to, subject });
     return;
   }
 

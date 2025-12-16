@@ -38,7 +38,6 @@ const Navbar = () => {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery);
     setIsSearchOpen(false);
     // Add your search logic here
   };
@@ -239,31 +238,34 @@ const Navbar = () => {
             {/* Social Links - Always Visible on Desktop */}
             <div className="flex items-center gap-3 pl-3 ml-2 border-l-2 border-gray-200">
               <a 
-                href="https://facebook.com" 
+                href="https://www.facebook.com/share/1AQNLDpmJV/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="group relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-500 hover:to-blue-600 transition-all duration-300 hover:scale-110 hover:shadow-lg" 
                 aria-label="Facebook"
+                title="Follow Ravi Singh on Facebook"
               >
                 <Facebook className="w-4 h-4 text-blue-600 group-hover:text-white transition-colors" />
               </a>
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/singhraviofficial" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="group relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-pink-50 to-purple-100 hover:from-pink-500 hover:to-purple-600 transition-all duration-300 hover:scale-110 hover:shadow-lg" 
                 aria-label="Instagram"
+                title="Follow @singhraviofficial on Instagram"
               >
                 <Instagram className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
               </a>
               <a 
-                href="https://whatsapp.com" 
+                href="https://wa.me/919931584900?text=Hi!%20I%20want%20to%20know%20more%20about%20Namaste%20Bharat%20Ice%20Cream" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="group relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-red-50 to-red-100 hover:from-red-500 hover:to-red-600 transition-all duration-300 hover:scale-110 hover:shadow-lg" 
-                aria-label="MessageCircleMore"
+                className="group relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-green-50 to-green-100 hover:from-green-500 hover:to-green-600 transition-all duration-300 hover:scale-110 hover:shadow-lg" 
+                aria-label="WhatsApp"
+                title="Chat with us on WhatsApp"
               >
-                <MessageCircleMore className="w-4 h-4 text-red-600 group-hover:text-white transition-colors" />
+                <MessageCircleMore className="w-4 h-4 text-green-600 group-hover:text-white transition-colors" />
               </a>
             </div>
           </div>
@@ -390,31 +392,34 @@ const Navbar = () => {
                     <p className="text-sm font-semibold text-gray-700 mb-3">Follow Us</p>
                     <div className="flex items-center justify-center gap-4">
                       <a 
-                        href="https://facebook.com" 
+                        href="https://www.facebook.com/share/1AQNLDpmJV/" 
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 shadow-md hover:shadow-lg hover:from-blue-500 hover:to-blue-600 group transition-all hover:scale-110"
                         aria-label="Facebook"
+                        title="Follow Ravi Singh on Facebook"
                       >
                         <Facebook className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" />
                       </a>
                       <a 
-                        href="https://instagram.com" 
+                        href="https://www.instagram.com/singhraviofficial" 
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-pink-50 to-purple-100 shadow-md hover:shadow-lg hover:from-pink-500 hover:to-purple-600 group transition-all hover:scale-110"
                         aria-label="Instagram"
+                        title="Follow @singhraviofficial on Instagram"
                       >
                         <Instagram className="w-5 h-5 text-purple-600 group-hover:text-white transition-colors" />
                       </a>
                       <a 
-                        href="https://whatsapp.com" 
+                        href="https://wa.me/919931584900?text=Hi!%20I%20want%20to%20know%20more%20about%20Namaste%20Bharat%20Ice%20Cream" 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-red-50 to-red-100 shadow-md hover:shadow-lg hover:from-red-500 hover:to-red-600 group transition-all hover:scale-110"
-                        aria-label="YouTube"
+                        className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-green-50 to-green-100 shadow-md hover:shadow-lg hover:from-green-500 hover:to-green-600 group transition-all hover:scale-110"
+                        aria-label="WhatsApp"
+                        title="Chat with us on WhatsApp"
                       >
-                        <MessageCircleMore className="w-5 h-5 text-red-600 group-hover:text-white transition-colors" />
+                        <MessageCircleMore className="w-5 h-5 text-green-600 group-hover:text-white transition-colors" />
                       </a>
                     </div>
                   </div>

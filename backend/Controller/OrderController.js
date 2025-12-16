@@ -40,12 +40,8 @@ async function createOrder(req, res) {
     });
 
     // emails (do not block request)
-    sendOrderNotificationToAdmin(order).catch((err) =>
-      console.error("Admin email error:", err.message)
-    );
-    sendOrderConfirmationToCustomer(order).catch((err) =>
-      console.error("Customer email error:", err.message)
-    );
+    sendOrderNotificationToAdmin(order).catch(() => {});
+    sendOrderConfirmationToCustomer(order).catch(() => {});
 
     return res.status(201).json({
       success: true,
@@ -53,7 +49,6 @@ async function createOrder(req, res) {
       order,
     });
   } catch (error) {
-    console.error("Create order error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Server error while creating order" });
@@ -68,7 +63,6 @@ async function getOrders(req, res) {
     });
     return res.json({ success: true, orders });
   } catch (error) {
-    console.error("Get user orders error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Server error fetching orders" });
@@ -84,7 +78,6 @@ async function getAdminOrders(req, res) {
 
     return res.json({ success: true, orders });
   } catch (error) {
-    console.error("Get admin orders error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Server error fetching orders" });
@@ -121,9 +114,7 @@ async function updateOrderStatus(req, res) {
     await order.save();
 
     // send automatic email to user
-    sendOrderStatusEmail(order).catch((err) =>
-      console.error("Order status email error:", err.message)
-    );
+    sendOrderStatusEmail(order).catch(() => {});
 
     return res.json({
       success: true,
@@ -131,7 +122,6 @@ async function updateOrderStatus(req, res) {
       order,
     });
   } catch (error) {
-    console.error("Update order status error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to update order status" });
@@ -169,9 +159,7 @@ async function cancelOrder(req, res) {
     await order.save();
 
     // send automatic email to user about cancellation
-    sendOrderStatusEmail(order).catch((err) =>
-      console.error("Order cancellation email error:", err.message)
-    );
+    sendOrderStatusEmail(order).catch(() => {});
 
     return res.json({
       success: true,
@@ -179,7 +167,6 @@ async function cancelOrder(req, res) {
       order,
     });
   } catch (error) {
-    console.error("Cancel order error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to cancel order" });
@@ -204,7 +191,6 @@ async function deleteOrder(req, res) {
       message: "Order deleted successfully",
     });
   } catch (error) {
-    console.error("Delete order error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to delete order" });

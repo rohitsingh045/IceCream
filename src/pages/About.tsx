@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Sparkles, Users, Award, IceCream, MapPin, Truck, Calendar, CheckCircle, PartyPopper, Gift, Phone, Mail, Clock, Star, Zap, Tag, Target, Megaphone } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const About = () => {
   const offerings = [
@@ -244,8 +243,8 @@ const About = () => {
           <Card className="mt-10 overflow-hidden border-2 border-primary/20 shadow-xl">
             <div className="bg-gradient-to-r from-primary via-secondary to-accent p-6 text-white text-center">
               <Gift className="w-12 h-12 mx-auto mb-3" />
-              <h3 className="text-2xl md:text-3xl font-bold mb-2">Bulk Orders Special Benefits</h3>
-              <p className="text-white/90">50+ ice creams order करने पर मिलेंगे ये amazing benefits! 🎁</p>
+              {/* <h3 className="text-2xl md:text-3xl font-bold mb-2">Bulk Orders Special Benefits</h3>
+              <p className="text-white/90">50+ ice creams order करने पर मिलेंगे ये amazing benefits! 🎁</p> */}
             </div>
             
             <CardContent className="p-8">
@@ -290,7 +289,7 @@ const About = () => {
                       <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div className="text-left">
-                      <h4 className="font-bold text-foreground">Minimum Order: 50+ Ice Creams</h4>
+                      <h4 className="font-bold text-foreground">Minimum Order: Ice Creams</h4>
                       <p className="text-sm text-muted-foreground">Perfect for weddings, parties, and corporate events</p>
                     </div>
                   </div>
@@ -305,8 +304,8 @@ const About = () => {
 
               <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                 <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg">
-                  <p className="text-2xl font-bold text-primary mb-1">30%</p>
-                  <p className="text-xs text-muted-foreground">Discount on 100+ items</p>
+                  {/* <p className="text-2xl font-bold text-primary mb-1">30%</p>
+                  <p className="text-xs text-muted-foreground">Discount on 100+ items</p> */}
                 </div>
                 <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg">
                   <p className="text-2xl font-bold text-primary mb-1">24 Hours</p>
@@ -355,10 +354,10 @@ const About = () => {
                       <p className="text-muted-foreground">{location.address}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Phone className="w-5 h-5 text-primary flex-shrink-0" />
-                      <a href={`tel:${location.phone}`} className="text-primary font-semibold hover:underline">
+                      {/* <Phone className="w-5 h-5 text-primary flex-shrink-0" /> */}
+                      {/* <a href={`tel:${location.phone}`} className="text-primary font-semibold hover:underline">
                         {location.phone}
-                      </a>
+                      </a> */}
                     </div>
                     <div className="flex items-center gap-3">
                       <Clock className="w-5 h-5 text-primary flex-shrink-0" />
@@ -521,7 +520,6 @@ const About = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
