@@ -13,7 +13,6 @@ const getAllProducts = async (req, res) => {
       products,
     });
   } catch (error) {
-    console.error('Get all products error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching products',
@@ -41,7 +40,6 @@ const getProductById = async (req, res) => {
       product,
     });
   } catch (error) {
-    console.error('Get product by ID error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching product',
@@ -55,7 +53,7 @@ const getProductById = async (req, res) => {
 // @access  Private/Admin
 const createProduct = async (req, res) => {
   try {
-    const { name, category, price, image, rating, description, flavors, isNew, isPopular, displaySection } = req.body;
+    const { name, category, price, image, rating, description, flavors, isNewProduct, isPopular, displaySection } = req.body;
 
     // Validate required fields
     if (!name || !category || !price) {
@@ -73,7 +71,7 @@ const createProduct = async (req, res) => {
       rating: rating || 0,
       description,
       flavors,
-      isNew: isNew || false,
+      isNewProduct: isNewProduct || false,
       isPopular: isPopular || false,
       displaySection: displaySection || 'products',
     });
@@ -84,7 +82,6 @@ const createProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    console.error('Create product error:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating product',
@@ -122,7 +119,6 @@ const updateProduct = async (req, res) => {
       product: updatedProduct,
     });
   } catch (error) {
-    console.error('Update product error:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating product',
@@ -152,7 +148,6 @@ const deleteProduct = async (req, res) => {
       message: 'Product deleted successfully',
     });
   } catch (error) {
-    console.error('Delete product error:', error);
     res.status(500).json({
       success: false,
       message: 'Error deleting product',

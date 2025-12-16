@@ -256,7 +256,7 @@ const Checkout = () => {
                         name="city"
                         value={formData.city}
                         onChange={handleInputChange}
-                        placeholder="Mumbai"
+                        placeholder="Enter your City"
                         required
                       />
                     </div>
@@ -269,7 +269,7 @@ const Checkout = () => {
                         name="state"
                         value={formData.state}
                         onChange={handleInputChange}
-                        placeholder="Maharashtra"
+                        placeholder="Enter your state "
                         required
                       />
                     </div>
@@ -284,7 +284,7 @@ const Checkout = () => {
                         name="pincode"
                         value={formData.pincode}
                         onChange={handleInputChange}
-                        placeholder="400001"
+                        placeholder="Enter your pincode"
                         required
                       />
                     </div>
@@ -295,7 +295,7 @@ const Checkout = () => {
                         name="landmark"
                         value={formData.landmark}
                         onChange={handleInputChange}
-                        placeholder="Near Park"
+                        placeholder="Enter your land mark.."
                       />
                     </div>
                   </div>

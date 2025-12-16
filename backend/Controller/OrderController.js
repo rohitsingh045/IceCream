@@ -5,6 +5,11 @@ const {
   sendOrderConfirmationToCustomer,
   sendOrderStatusEmail,
 } = require("../services/emailService");
+const {
+  sendOrderStatusNotification,
+  sendNewOrderNotificationToAdmin,
+  sendOrderConfirmationNotification,
+} = require("../services/notificationService");
 
 // USER: create new order
 async function createOrder(req, res) {
@@ -39,9 +44,14 @@ async function createOrder(req, res) {
       paymentStatus: paymentMethod === "cod" ? "pending" : "paid",
     });
 
-    // emails (do not block request)
+    // Send notifications (do not block request)
+    // Email notifications
     sendOrderNotificationToAdmin(order).catch(() => {});
     sendOrderConfirmationToCustomer(order).catch(() => {});
+    
+    // WhatsApp & SMS notifications
+    sendNewOrderNotificationToAdmin(order).catch(() => {});
+    sendOrderConfirmationNotification(order).catch(() => {});
 
     return res.status(201).json({
       success: true,
@@ -58,14 +68,19 @@ async function createOrder(req, res) {
 // USER: get own orders
 async function getOrders(req, res) {
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ success: false, message: "User not authenticated" });
+    }
+    
     const orders = await Order.find({ user: req.user._id }).sort({
       createdAt: -1,
     });
     return res.json({ success: true, orders });
   } catch (error) {
+    console.error("Get orders error:", error);
     return res
       .status(500)
-      .json({ success: false, message: "Server error fetching orders" });
+      .json({ success: false, message: "Server error fetching orders", error: error.message });
   }
 }
 
@@ -78,6 +93,7 @@ async function getAdminOrders(req, res) {
 
     return res.json({ success: true, orders });
   } catch (error) {
+    console.error("Get admin orders error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Server error fetching orders" });
@@ -113,8 +129,12 @@ async function updateOrderStatus(req, res) {
     
     await order.save();
 
-    // send automatic email to user
+    // Send notifications (do not block request)
+    // Email notification
     sendOrderStatusEmail(order).catch(() => {});
+    
+    // WhatsApp & SMS notifications
+    sendOrderStatusNotification(order).catch(() => {});
 
     return res.json({
       success: true,
@@ -158,8 +178,12 @@ async function cancelOrder(req, res) {
     order.cancelledBy = "user";
     await order.save();
 
-    // send automatic email to user about cancellation
+    // Send notifications (do not block request)
+    // Email notification
     sendOrderStatusEmail(order).catch(() => {});
+    
+    // WhatsApp & SMS notifications
+    sendOrderStatusNotification(order).catch(() => {});
 
     return res.json({
       success: true,
