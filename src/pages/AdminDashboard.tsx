@@ -53,6 +53,9 @@ import {
   Star,
   Crown,
   Package,
+  Gift,
+  ShoppingBag,
+  CheckCircle,
 } from "lucide-react";
 
 interface OrderItem {
@@ -1067,33 +1070,91 @@ const AdminDashboard = () => {
                               </Badge>
                               <p className="text-xs text-muted-foreground mt-1">Cannot modify</p>
                             </div>
+                          ) : order.orderStatus === "cancelled" ? (
+                            <div className="text-center">
+                              <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">
+                                Admin Cancelled
+                              </Badge>
+                              <Button
+                                variant="link"
+                                size="sm"
+                                className="text-xs text-blue-500 p-0 h-auto mt-1"
+                                onClick={() => updateOrderStatus(order._id, "pending")}
+                              >
+                                Restore to Pending
+                              </Button>
+                            </div>
                           ) : (
-                            <Select
-                              value={order.orderStatus}
-                              onValueChange={(val) =>
-                                updateOrderStatus(order._id, val)
-                              }
-                            >
-                              <SelectTrigger className="w-[130px]">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="confirmed">
-                                  Confirmed (Accept)
-                                </SelectItem>
-                                <SelectItem value="processing">
-                                  Processing
-                                </SelectItem>
-                                <SelectItem value="shipped">Shipped</SelectItem>
-                                <SelectItem value="delivered">
-                                  Delivered
-                                </SelectItem>
-                                <SelectItem value="cancelled">
-                                  Cancelled (Reject)
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <div className="min-w-[280px]">
+                              {/* Visual Progress Tracker */}
+                              <div className="flex items-center justify-between gap-1">
+                                {[
+                                  { key: "pending", label: "Placed", icon: ShoppingBag },
+                                  { key: "confirmed", label: "Confirmed", icon: CheckCircle },
+                                  { key: "shipped", label: "Shipped", icon: Truck },
+                                  { key: "delivered", label: "Delivered", icon: Gift },
+                                ].map((step, index, arr) => {
+                                  const statusOrder = ["pending", "confirmed", "shipped", "delivered"];
+                                  const currentIndex = statusOrder.indexOf(order.orderStatus.toLowerCase());
+                                  const stepIndex = statusOrder.indexOf(step.key);
+                                  const isCompleted = stepIndex <= currentIndex;
+                                  const isCurrent = stepIndex === currentIndex;
+                                  const StepIcon = step.icon;
+                                  const isLast = index === arr.length - 1;
+
+                                  return (
+                                    <div key={step.key} className="flex items-center flex-1">
+                                      {/* Step Circle - Clickable */}
+                                      <button
+                                        onClick={() => updateOrderStatus(order._id, step.key)}
+                                        className={`
+                                          relative flex flex-col items-center group cursor-pointer transition-all duration-200
+                                          ${isCurrent ? 'scale-110' : 'hover:scale-105'}
+                                        `}
+                                        title={`Set to ${step.label}`}
+                                      >
+                                        <div className={`
+                                          w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-200
+                                          ${isCompleted 
+                                            ? "bg-green-500 border-green-500 text-white" 
+                                            : "bg-white border-gray-300 text-gray-400 hover:border-green-400 hover:text-green-500"}
+                                          ${isCurrent ? "ring-2 ring-green-200" : ""}
+                                        `}>
+                                          <StepIcon className="h-4 w-4" />
+                                        </div>
+                                        <span className={`
+                                          text-[10px] mt-1 font-medium whitespace-nowrap
+                                          ${isCompleted ? "text-green-600" : "text-gray-400"}
+                                        `}>
+                                          {step.label}
+                                        </span>
+                                      </button>
+                                      
+                                      {/* Connecting Line */}
+                                      {!isLast && (
+                                        <div className={`
+                                          flex-1 h-0.5 mx-1 transition-all duration-200
+                                          ${stepIndex < currentIndex ? "bg-green-500" : "bg-gray-200"}
+                                        `} />
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              
+                              {/* Cancel Button */}
+                              <div className="mt-2 text-center">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 h-6 px-2"
+                                  onClick={() => updateOrderStatus(order._id, "cancelled")}
+                                >
+                                  <XCircle className="h-3 w-3 mr-1" />
+                                  Cancel Order
+                                </Button>
+                              </div>
+                            </div>
                           )}
                         </TableCell>
 

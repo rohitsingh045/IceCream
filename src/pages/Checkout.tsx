@@ -120,10 +120,8 @@ const Checkout = () => {
         toast.success("Order placed successfully! 🎉");
         clearCart();
         
-        // Show success message
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
+        // Navigate to order success page
+        navigate(`/order-success?orderId=${data.order._id}`);
       } else {
         throw new Error(data.message || "Failed to place order");
       }

@@ -4,6 +4,7 @@ const { protect, authorize } = require("../Middleware/authMiddleware");
 const {
   createOrder,
   getOrders,
+  getOrderById,
   getAdminOrders,
   updateOrderStatus,
   cancelOrder,
@@ -15,6 +16,9 @@ router.post("/", protect, createOrder);
 
 // user sees own orders
 router.get("/", protect, getOrders);
+
+// user gets single order by ID
+router.get("/:id", protect, getOrderById);
 
 // user cancels own order (only if pending)
 router.patch("/:id/cancel", protect, cancelOrder);

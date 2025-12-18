@@ -189,6 +189,47 @@ const Account = () => {
     }
   };
 
+  // Order progress steps
+  const orderSteps = [
+    { key: "pending", label: "Order Placed", icon: ShoppingBag },
+    { key: "confirmed", label: "Confirmed", icon: CheckCircle },
+    { key: "shipped", label: "Shipped", icon: Truck },
+    { key: "delivered", label: "Delivered", icon: Gift },
+  ];
+
+  const getStepStatus = (orderStatus: string, stepKey: string) => {
+    const statusOrder = ["pending", "confirmed", "shipped", "delivered"];
+    const currentIndex = statusOrder.indexOf(orderStatus.toLowerCase());
+    const stepIndex = statusOrder.indexOf(stepKey);
+    
+    if (orderStatus.toLowerCase() === "cancelled") {
+      return stepKey === "pending" ? "cancelled" : "upcoming";
+    }
+    
+    if (stepIndex < currentIndex) return "completed";
+    if (stepIndex === currentIndex) return "current";
+    return "upcoming";
+  };
+
+  const getEstimatedDate = (createdAt: string, step: string) => {
+    const date = new Date(createdAt);
+    switch (step) {
+      case "pending":
+        return formatDate(createdAt);
+      case "confirmed":
+        date.setHours(date.getHours() + 2);
+        return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+      case "shipped":
+        date.setDate(date.getDate() + 1);
+        return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+      case "delivered":
+        date.setDate(date.getDate() + 3);
+        return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+      default:
+        return "";
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
       year: "numeric",
@@ -407,6 +448,105 @@ const Account = () => {
                     </AccordionTrigger>
                     <AccordionContent className="px-6 pb-6">
                       <Separator className="mb-5 bg-gradient-to-r from-pink-200 via-purple-200 to-cyan-200" />
+
+                      {/* Order Progress Tracker */}
+                      {order.orderStatus.toLowerCase() !== "cancelled" ? (
+                        <div className="mb-6 p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-100">
+                          <h4 className="font-bold text-gray-800 mb-1 flex items-center gap-2">
+                            <div className="p-1.5 rounded-lg bg-green-100">
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                            </div>
+                            {order.orderStatus.toLowerCase() === "delivered" 
+                              ? "Order Delivered!" 
+                              : order.orderStatus.toLowerCase() === "shipped"
+                              ? "Order Shipped"
+                              : order.orderStatus.toLowerCase() === "confirmed"
+                              ? "Order Confirmed"
+                              : "Order Placed"}
+                          </h4>
+                          <p className="text-sm text-gray-500 mb-5 ml-9">
+                            {order.orderStatus.toLowerCase() === "delivered"
+                              ? "Your order has been delivered. Enjoy your ice cream! 🍦"
+                              : order.orderStatus.toLowerCase() === "shipped"
+                              ? "Your order is on its way to you!"
+                              : order.orderStatus.toLowerCase() === "confirmed"
+                              ? "Your order has been confirmed and is being prepared."
+                              : "Your order has been placed successfully."}
+                          </p>
+                          
+                          {/* Progress Steps */}
+                          <div className="relative">
+                            <div className="flex justify-between items-start">
+                              {orderSteps.map((step, index) => {
+                                const status = getStepStatus(order.orderStatus, step.key);
+                                const StepIcon = step.icon;
+                                const isLast = index === orderSteps.length - 1;
+                                
+                                return (
+                                  <div key={step.key} className="flex flex-col items-center relative z-10 flex-1">
+                                    {/* Step Circle */}
+                                    <div className={`
+                                      w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                                      ${status === "completed" 
+                                        ? "bg-green-500 border-green-500 text-white" 
+                                        : status === "current"
+                                        ? "bg-green-500 border-green-500 text-white ring-4 ring-green-100"
+                                        : "bg-white border-gray-300 text-gray-400"}
+                                    `}>
+                                      {status === "completed" ? (
+                                        <CheckCircle className="h-5 w-5" />
+                                      ) : (
+                                        <StepIcon className="h-5 w-5" />
+                                      )}
+                                    </div>
+                                    
+                                    {/* Step Label */}
+                                    <p className={`
+                                      text-xs font-semibold mt-2 text-center
+                                      ${status === "completed" || status === "current" ? "text-green-600" : "text-gray-400"}
+                                    `}>
+                                      {step.label}
+                                    </p>
+                                    
+                                    {/* Connecting Line */}
+                                    {!isLast && (
+                                      <div className="absolute top-5 left-[calc(50%+20px)] w-[calc(100%-40px)] h-0.5">
+                                        <div className={`
+                                          h-full transition-all duration-500
+                                          ${status === "completed" ? "bg-green-500" : "bg-gray-200"}
+                                        `} />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          
+                          {/* Delivery info message */}
+                          {order.orderStatus.toLowerCase() !== "delivered" && (
+                            <div className="mt-5 pt-4 border-t border-green-100">
+                              <p className="text-xs text-gray-500 flex items-center gap-2">
+                                <Clock className="h-3.5 w-3.5 text-gray-400" />
+                                Delivery executive details will be available once the order is out for delivery
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        /* Cancelled Order Message */
+                        <div className="mb-6 p-5 bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl border border-red-100">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-full bg-red-100">
+                              <XCircle className="h-6 w-6 text-red-500" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-red-700">Order Cancelled</h4>
+                              <p className="text-sm text-red-600">This order has been cancelled.</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Order Items */}
                       <div className="mb-6">

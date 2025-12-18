@@ -77,7 +77,6 @@ async function getOrders(req, res) {
     });
     return res.json({ success: true, orders });
   } catch (error) {
-    console.error("Get orders error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Server error fetching orders", error: error.message });
@@ -93,7 +92,6 @@ async function getAdminOrders(req, res) {
 
     return res.json({ success: true, orders });
   } catch (error) {
-    console.error("Get admin orders error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Server error fetching orders" });
@@ -221,9 +219,36 @@ async function deleteOrder(req, res) {
   }
 }
 
+// USER: get single order by ID
+async function getOrderById(req, res) {
+  try {
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    // Check if user owns this order (unless admin)
+    if (req.user.role !== "admin" && order.user.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Not authorized to view this order" });
+    }
+
+    return res.json({ success: true, order });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch order" });
+  }
+}
+
 module.exports = {
   createOrder,
   getOrders,
+  getOrderById,
   getAdminOrders,
   updateOrderStatus,
   cancelOrder,
