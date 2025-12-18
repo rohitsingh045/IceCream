@@ -135,7 +135,17 @@ async function sendOrderStatusNotification(order) {
       break;
     case "delivered":
       emoji = "🎉";
-      statusMessage = `आपका ऑर्डर deliver हो गया है! Enjoy your ice cream! 🍦\nYour order has been delivered. Thank you for ordering!`;
+      statusMessage = `आपका ऑर्डर successfully deliver हो गया है! 🍦
+
+🙏 *Thank you for ordering from Namaste Bharat Ice Cream!*
+
+हमें उम्मीद है कि आपको हमारी ice cream पसंद आएगी। आपकी खुशी ही हमारी प्राथमिकता है!
+
+We hope you enjoy our delicious ice cream. Your happiness is our priority!
+
+⭐ अगर आपको हमारी service पसंद आई तो अपने friends और family को जरूर बताएं!
+
+See you again soon! 🍨❤️`;
       break;
     case "cancelled":
     case "rejected":
