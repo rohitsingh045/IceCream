@@ -197,46 +197,6 @@ const Navbar = () => {
                 <Sun className="w-4 h-4 text-yellow-400" />
               )}
             </Button>
-
-            {/* Desktop Search */}
-            <div className="relative group">
-              {!isSearchOpen ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsSearchOpen(true)}
-                  className="h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary transition-all"
-                >
-                  <Search className="w-4 h-4" />
-                </Button>
-              ) : (
-                <form onSubmit={handleSearch} className="relative flex items-center gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50" />
-                    <Input
-                      type="text"
-                      placeholder="Search flavors..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      autoFocus
-                      className="pl-10 pr-10 py-2 h-9 w-64 text-sm border-2 border-primary/30 text-gray-900 placeholder:text-gray-400 focus:border-primary rounded-full transition-all shadow-lg"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setIsSearchOpen(false);
-                        setSearchQuery("");
-                      }}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full hover:bg-gray-100"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </div>
             
             {/* Auth Section */}
             <div className="flex items-center gap-2">
@@ -396,18 +356,6 @@ const Navbar = () => {
                       })}
                     </div>
                   </div>
-
-                  {/* Mobile Search */}
-                  <form onSubmit={handleSearch} className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50" />
-                    <Input
-                      type="text"
-                      placeholder="Search flavors..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 pr-3 py-2 h-10 w-full text-sm rounded-full border-2 border-primary/20 focus:border-primary placeholder:text-gray-400 shadow-sm"
-                    />
-                  </form>
 
                   {/* Navigation Links */}
                   <div className="flex flex-col gap-2">
