@@ -36,7 +36,7 @@ const App = () => (
             <Sonner />
             <div className="min-h-screen flex flex-col overflow-x-hidden">
               <Navbar />
-              <main className="flex-1 overflow-x-hidden">
+              <main className="flex-1 overflow-x-hidden pt-16">
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/menu" element={<Menu />} />
