@@ -14,7 +14,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 
 const Footer = () => {
   return (
-    <footer className="relative bg-gradient-to-br from-primary/95 via-secondary/95 to-accent/95 overflow-hidden mt-16">
+    <footer className="relative bg-gradient-to-br from-primary/95 via-secondary/95 to-accent/95 overflow-hidden mt-16 w-full max-w-full">
       {/* Decorative elements */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.1),transparent_50%)]" />

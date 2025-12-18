@@ -347,12 +347,12 @@ const Navbar = () => {
                   <Menu className="w-4 h-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[380px] bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
+              <SheetContent side="right" className="w-[300px] sm:w-[380px] bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle className="text-gray-900 dark:text-white text-xl font-bold">Menu</SheetTitle>
                 </SheetHeader>
                 
-                <div className="flex flex-col gap-6 mt-8">
+                <div className="flex flex-col gap-6 mt-8 pb-8">
                   {/* Theme Toggle - Mobile */}
                   <div className="flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
                     <span className="font-medium text-gray-700 dark:text-gray-300">Dark Mode</span>

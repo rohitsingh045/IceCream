@@ -34,9 +34,9 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col overflow-x-hidden">
               <Navbar />
-              <main className="flex-1">
+              <main className="flex-1 overflow-x-hidden">
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/menu" element={<Menu />} />

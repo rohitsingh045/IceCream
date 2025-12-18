@@ -72,26 +72,26 @@ const HeroCarousel = () => {
           {slides.map((slide, index) => (
             <div key={index} className="flex-[0_0_100%] min-w-0">
               <div 
-                className="relative min-h-[calc(100vh-80px)] flex items-center"
+                className="relative min-h-[calc(100vh-80px)] flex items-center overflow-hidden"
                 style={{ background: "var(--gradient-hero)" }}
               >
-                <div className="container mx-auto px-6 py-20">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-20 overflow-hidden">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     {/* Left Content */}
-                    <div className="space-y-6 text-white animate-fade-in">
-                      <h1 className="text-6xl md:text-8xl font-bold leading-tight">
+                    <div className="space-y-4 sm:space-y-6 text-white animate-fade-in text-center lg:text-left">
+                      <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold leading-tight">
                         {slide.title}
                       </h1>
-                      <p className="text-3xl md:text-4xl font-light italic opacity-90">
+                      <p className="text-xl sm:text-3xl md:text-4xl font-light italic opacity-90">
                         {slide.subtitle}
                       </p>
-                      <p className="text-lg md:text-xl max-w-lg opacity-80 leading-relaxed">
+                      <p className="text-base sm:text-lg md:text-xl max-w-lg opacity-80 leading-relaxed mx-auto lg:mx-0">
                         {slide.description}
                       </p>
                     </div>
 
                     {/* Right Product Images */}
-                    <div className="relative flex items-center justify-center gap-6 animate-slide-in">
+                    <div className="relative flex items-center justify-center gap-4 sm:gap-6 animate-slide-in">
                       {slide.images.map((image, imgIndex) => (
                         <div 
                           key={imgIndex}
@@ -101,7 +101,7 @@ const HeroCarousel = () => {
                           <img
                             src={image}
                             alt={`Ice cream box ${imgIndex + 1}`}
-                            className="w-64 h-auto object-contain drop-shadow-2xl"
+                            className="w-32 sm:w-48 md:w-64 h-auto object-contain drop-shadow-2xl max-w-full"
                           />
                         </div>
                       ))}
