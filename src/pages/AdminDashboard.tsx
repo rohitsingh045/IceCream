@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { API_URL } from "@/lib/api";
+import { generateOrdersExcel } from "@/lib/invoiceGenerator";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,27 @@ import {
   Gift,
   ShoppingBag,
   CheckCircle,
+  Download,
+  BarChart3,
+  Calendar,
+  IndianRupee,
 } from "lucide-react";
+
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  Legend,
+} from "recharts";
 
 interface OrderItem {
   productSlug: string;
@@ -147,6 +168,26 @@ const AdminDashboard = () => {
     displaySection: "products",
   });
 
+  // Analytics state
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [dateRangeStart, setDateRangeStart] = useState("");
+  const [dateRangeEnd, setDateRangeEnd] = useState("");
+  const [analyticsData, setAnalyticsData] = useState<{
+    dailySales: { date: string; sales: number; orders: number }[];
+    topProducts: { name: string; quantity: number; revenue: number }[];
+    statusBreakdown: { status: string; count: number }[];
+    totalRevenue: number;
+    totalOrders: number;
+    avgOrderValue: number;
+  }>({
+    dailySales: [],
+    topProducts: [],
+    statusBreakdown: [],
+    totalRevenue: 0,
+    totalOrders: 0,
+    avgOrderValue: 0,
+  });
+
   // -------------------------------
   // Redirect non-logged in / non-admin users
   // -------------------------------
@@ -169,6 +210,120 @@ const AdminDashboard = () => {
     fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isAuthenticated, user]);
+
+  // Calculate analytics when orders change
+  useEffect(() => {
+    if (orders.length === 0) return;
+
+    // Filter by date range if set
+    let filteredForAnalytics = orders;
+    if (dateRangeStart) {
+      filteredForAnalytics = filteredForAnalytics.filter(
+        (o) => new Date(o.createdAt) >= new Date(dateRangeStart)
+      );
+    }
+    if (dateRangeEnd) {
+      const endDate = new Date(dateRangeEnd);
+      endDate.setHours(23, 59, 59, 999);
+      filteredForAnalytics = filteredForAnalytics.filter(
+        (o) => new Date(o.createdAt) <= endDate
+      );
+    }
+
+    // Daily sales (last 7 days)
+    const dailySalesMap: Record<string, { sales: number; orders: number }> = {};
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return d.toISOString().split("T")[0];
+    });
+
+    last7Days.forEach((date) => {
+      dailySalesMap[date] = { sales: 0, orders: 0 };
+    });
+
+    filteredForAnalytics.forEach((order) => {
+      const date = new Date(order.createdAt).toISOString().split("T")[0];
+      if (dailySalesMap[date]) {
+        dailySalesMap[date].sales += order.totalAmount;
+        dailySalesMap[date].orders += 1;
+      }
+    });
+
+    const dailySales = Object.entries(dailySalesMap).map(([date, data]) => ({
+      date: new Date(date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric" }),
+      sales: Math.round(data.sales),
+      orders: data.orders,
+    }));
+
+    // Top products
+    const productMap: Record<string, { quantity: number; revenue: number }> = {};
+    filteredForAnalytics.forEach((order) => {
+      order.items.forEach((item) => {
+        if (!productMap[item.name]) {
+          productMap[item.name] = { quantity: 0, revenue: 0 };
+        }
+        productMap[item.name].quantity += item.quantity;
+        productMap[item.name].revenue += item.quantity * item.price;
+      });
+    });
+
+    const topProducts = Object.entries(productMap)
+      .map(([name, data]) => ({ name, ...data }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 5);
+
+    // Status breakdown
+    const statusMap: Record<string, number> = {};
+    filteredForAnalytics.forEach((order) => {
+      const status = order.orderStatus.toLowerCase();
+      statusMap[status] = (statusMap[status] || 0) + 1;
+    });
+
+    const statusBreakdown = Object.entries(statusMap).map(([status, count]) => ({
+      status: status.charAt(0).toUpperCase() + status.slice(1),
+      count,
+    }));
+
+    // Totals
+    const totalRevenue = filteredForAnalytics.reduce((sum, o) => sum + o.totalAmount, 0);
+    const totalOrders = filteredForAnalytics.length;
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    setAnalyticsData({
+      dailySales,
+      topProducts,
+      statusBreakdown,
+      totalRevenue,
+      totalOrders,
+      avgOrderValue,
+    });
+  }, [orders, dateRangeStart, dateRangeEnd]);
+
+  const exportToExcel = () => {
+    let ordersToExport = orders;
+    
+    if (dateRangeStart) {
+      ordersToExport = ordersToExport.filter(
+        (o) => new Date(o.createdAt) >= new Date(dateRangeStart)
+      );
+    }
+    if (dateRangeEnd) {
+      const endDate = new Date(dateRangeEnd);
+      endDate.setHours(23, 59, 59, 999);
+      ordersToExport = ordersToExport.filter(
+        (o) => new Date(o.createdAt) <= endDate
+      );
+    }
+
+    if (ordersToExport.length === 0) {
+      toast.error("No orders to export for selected date range");
+      return;
+    }
+
+    generateOrdersExcel(ordersToExport, "namaste_bharat_orders");
+    toast.success(`Exported ${ordersToExport.length} orders to Excel`);
+  };
 
   const fetchOrders = async () => {
     if (!token) return;
@@ -874,6 +1029,200 @@ const AdminDashboard = () => {
             </div>
           )}
         </div>
+
+        {/* ANALYTICS & EXPORT SECTION */}
+        <Card className="mb-8 backdrop-blur-sm bg-white/70 border-0 shadow-lg rounded-3xl overflow-hidden">
+          <CardHeader className="pb-2">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <CardTitle className="text-xl font-bold flex items-center gap-2">
+                <BarChart3 className="h-6 w-6 text-purple-500" />
+                Sales Analytics & Reports
+              </CardTitle>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAnalytics(!showAnalytics)}
+                  className="rounded-xl border-purple-300 text-purple-600 hover:bg-purple-50"
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  {showAnalytics ? "Hide Analytics" : "Show Analytics"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={exportToExcel}
+                  className="rounded-xl border-green-300 text-green-600 hover:bg-green-50"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export to Excel
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {/* Date Range Filter */}
+            <div className="flex flex-wrap gap-4 mb-4">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm text-gray-600">From:</Label>
+                <Input
+                  type="date"
+                  value={dateRangeStart}
+                  onChange={(e) => setDateRangeStart(e.target.value)}
+                  className="w-40 rounded-xl border-gray-300"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm text-gray-600">To:</Label>
+                <Input
+                  type="date"
+                  value={dateRangeEnd}
+                  onChange={(e) => setDateRangeEnd(e.target.value)}
+                  className="w-40 rounded-xl border-gray-300"
+                />
+              </div>
+              {(dateRangeStart || dateRangeEnd) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setDateRangeStart("");
+                    setDateRangeEnd("");
+                  }}
+                  className="text-red-500"
+                >
+                  Clear Dates
+                </Button>
+              )}
+            </div>
+
+            {showAnalytics && (
+              <div className="space-y-6">
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gradient-to-br from-green-100 to-emerald-50 rounded-2xl p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-green-500 rounded-xl">
+                        <IndianRupee className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-green-600">Total Revenue</p>
+                        <p className="text-2xl font-bold text-green-700">₹{analyticsData.totalRevenue.toFixed(0)}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-br from-blue-100 to-cyan-50 rounded-2xl p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-blue-500 rounded-xl">
+                        <ShoppingBag className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-600">Total Orders</p>
+                        <p className="text-2xl font-bold text-blue-700">{analyticsData.totalOrders}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-br from-purple-100 to-pink-50 rounded-2xl p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-purple-500 rounded-xl">
+                        <TrendingUp className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-purple-600">Avg Order Value</p>
+                        <p className="text-2xl font-bold text-purple-700">₹{analyticsData.avgOrderValue.toFixed(0)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Charts Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Daily Sales Chart */}
+                  <div className="bg-white rounded-2xl p-4 shadow-sm">
+                    <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                      <Calendar className="h-5 w-5 text-blue-500" />
+                      Last 7 Days Sales
+                    </h4>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <BarChart data={analyticsData.dailySales}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis dataKey="date" fontSize={12} />
+                        <YAxis fontSize={12} />
+                        <Tooltip 
+                          formatter={(value: number) => [`₹${value}`, "Sales"]}
+                          contentStyle={{ borderRadius: "10px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+                        />
+                        <Bar dataKey="sales" fill="url(#salesGradient)" radius={[8, 8, 0, 0]} />
+                        <defs>
+                          <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#ec4899" />
+                            <stop offset="100%" stopColor="#8b5cf6" />
+                          </linearGradient>
+                        </defs>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Order Status Pie Chart */}
+                  <div className="bg-white rounded-2xl p-4 shadow-sm">
+                    <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                      <Package className="h-5 w-5 text-purple-500" />
+                      Order Status Breakdown
+                    </h4>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <PieChart>
+                        <Pie
+                          data={analyticsData.statusBreakdown}
+                          dataKey="count"
+                          nameKey="status"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          label={({ status, count }) => `${status}: ${count}`}
+                        >
+                          {analyticsData.statusBreakdown.map((_, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={["#22c55e", "#eab308", "#3b82f6", "#8b5cf6", "#ef4444", "#6b7280"][index % 6]} 
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Top Products */}
+                <div className="bg-white rounded-2xl p-4 shadow-sm">
+                  <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <Star className="h-5 w-5 text-yellow-500" />
+                    Top Selling Products
+                  </h4>
+                  <div className="space-y-3">
+                    {analyticsData.topProducts.map((product, index) => (
+                      <div key={product.name} className="flex items-center gap-4">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
+                          index === 0 ? "bg-yellow-500" : index === 1 ? "bg-gray-400" : index === 2 ? "bg-orange-400" : "bg-gray-300"
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-800">{product.name}</p>
+                          <p className="text-sm text-gray-500">{product.quantity} units sold</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-green-600">₹{product.revenue.toFixed(0)}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {analyticsData.topProducts.length === 0 && (
+                      <p className="text-center text-gray-500 py-4">No sales data yet</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">

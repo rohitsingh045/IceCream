@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,8 +32,12 @@ import {
   Heart,
   Star,
   Gift,
+  RotateCcw,
+  Download,
+  FileText,
 } from "lucide-react";
 import { API_URL } from "@/lib/api";
+import { generateInvoicePDF } from "@/lib/invoiceGenerator";
 
 interface OrderItem {
   productId: string;
@@ -66,9 +71,27 @@ interface Order {
 const Account = () => {
   const navigate = useNavigate();
   const { user, token, isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
+
+  // Reorder function - add all items from an order to cart
+  const handleReorder = (order: Order) => {
+    order.items.forEach((item) => {
+      // Add each item to cart one at a time (addToCart handles quantity internally)
+      for (let i = 0; i < item.quantity; i++) {
+        addToCart({
+          id: item.productId || item.name.toLowerCase().replace(/\s+/g, "-"),
+          name: item.name,
+          price: item.price,
+          image: item.image || "",
+        });
+      }
+    });
+    toast.success(`Added ${order.items.length} items to cart! 🛒`);
+    navigate("/cart");
+  };
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -647,9 +670,35 @@ const Account = () => {
                         </div>
                       </div>
 
+                      {/* Action Buttons Row */}
+                      <div className="mt-6 pt-5 border-t border-gray-200 flex flex-wrap gap-3">
+                        {/* Download Invoice Button */}
+                        <Button
+                          variant="outline"
+                          className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 rounded-full px-6"
+                          onClick={() => generateInvoicePDF(order)}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Download Invoice
+                        </Button>
+
+                        {/* Reorder Button - Show for delivered/cancelled orders */}
+                        {(order.orderStatus.toLowerCase() === "delivered" || 
+                          order.orderStatus.toLowerCase() === "cancelled") && (
+                          <Button
+                            variant="outline"
+                            className="border-purple-300 text-purple-600 hover:bg-purple-50 hover:border-purple-400 rounded-full px-6"
+                            onClick={() => handleReorder(order)}
+                          >
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Reorder All Items
+                          </Button>
+                        )}
+                      </div>
+
                       {/* Cancel Button - Only show for pending orders */}
                       {order.orderStatus.toLowerCase() === "pending" && (
-                        <div className="mt-6 pt-5 border-t border-gray-200">
+                        <div className="mt-4">
                           <Button
                             variant="outline"
                             className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 rounded-full px-6"
@@ -683,6 +732,24 @@ const Account = () => {
                             <CheckCircle className="h-5 w-5" />
                             <span className="font-medium">Order confirmed! Cannot be cancelled.</span>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Reorder Button - Show for delivered or cancelled orders */}
+                      {(order.orderStatus.toLowerCase() === "delivered" || 
+                        order.orderStatus.toLowerCase() === "cancelled") && (
+                        <div className="mt-4">
+                          <Button
+                            onClick={() => handleReorder(order)}
+                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-full px-6"
+                          >
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Reorder All Items
+                          </Button>
+                          <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                            <ShoppingBag className="h-3 w-3" />
+                            Add all {order.items.length} items to cart instantly
+                          </p>
                         </div>
                       )}
                     </AccordionContent>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate, NavLink } from "react-router-dom";
-import { Facebook, Instagram, MessageCircleMore, User, LogIn, Menu, Search, LogOut, X, UserCircle } from "lucide-react";
+import { Facebook, Instagram, MessageCircleMore, User, LogIn, Menu, Search, LogOut, X, UserCircle, Sun, Moon, Sparkles } from "lucide-react";
+import { useTheme, seasonalThemes } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,8 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme, seasonalTheme, setSeasonalTheme, currentSeasonalConfig } = useTheme();
+  const [showSeasonalMenu, setShowSeasonalMenu] = useState(false);
   
   const isActive = (path: string) => location.pathname === path;
   
@@ -54,8 +57,8 @@ const Navbar = () => {
     <nav 
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'backdrop-blur-lg bg-white/98 shadow-xl border-b border-primary/20' 
-          : 'backdrop-blur-md bg-white/95 shadow-lg border-b border-primary/10'
+          ? 'backdrop-blur-lg bg-white/98 dark:bg-gray-900/98 shadow-xl border-b border-primary/20' 
+          : 'backdrop-blur-md bg-white/95 dark:bg-gray-900/95 shadow-lg border-b border-primary/10'
       }`}
     >
       {/* Main navbar */}
@@ -135,6 +138,66 @@ const Navbar = () => {
           
           {/* Desktop - Actions */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-shrink-0">
+            {/* Seasonal Theme Selector */}
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowSeasonalMenu(!showSeasonalMenu)}
+                className="h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary transition-all"
+                title="Festival Themes"
+              >
+                <span className="text-lg">{currentSeasonalConfig.icon}</span>
+              </Button>
+              
+              {showSeasonalMenu && (
+                <div className="absolute right-0 top-12 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-primary/20 p-2 z-50">
+                  <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase">Festival Themes</p>
+                  {(Object.keys(seasonalThemes) as Array<keyof typeof seasonalThemes>).map((key) => {
+                    const themeConfig = seasonalThemes[key];
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setSeasonalTheme(key);
+                          setShowSeasonalMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all ${
+                          seasonalTheme === key 
+                            ? "bg-primary/10 text-primary" 
+                            : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        <span className="text-xl">{themeConfig.icon}</span>
+                        <div className="text-left">
+                          <p className="font-medium text-sm">{themeConfig.name}</p>
+                          <p className="text-xs text-gray-500">{themeConfig.description}</p>
+                        </div>
+                        {seasonalTheme === key && (
+                          <span className="ml-auto text-primary">✓</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary transition-all"
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {theme === 'light' ? (
+                <Moon className="w-4 h-4" />
+              ) : (
+                <Sun className="w-4 h-4 text-yellow-400" />
+              )}
+            </Button>
+
             {/* Desktop Search */}
             <div className="relative group">
               {!isSearchOpen ? (
@@ -284,12 +347,56 @@ const Navbar = () => {
                   <Menu className="w-4 h-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[380px] bg-gradient-to-br from-white to-gray-50">
+              <SheetContent side="right" className="w-[300px] sm:w-[380px] bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
                 <SheetHeader>
-                  <SheetTitle className="text-gray-900 text-xl font-bold">Menu</SheetTitle>
+                  <SheetTitle className="text-gray-900 dark:text-white text-xl font-bold">Menu</SheetTitle>
                 </SheetHeader>
                 
                 <div className="flex flex-col gap-6 mt-8">
+                  {/* Theme Toggle - Mobile */}
+                  <div className="flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Dark Mode</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={toggleTheme}
+                      className="h-9 w-9 rounded-full hover:bg-primary/10"
+                    >
+                      {theme === 'light' ? (
+                        <Moon className="w-5 h-5" />
+                      ) : (
+                        <Sun className="w-5 h-5 text-yellow-400" />
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Seasonal Theme - Mobile */}
+                  <div className="px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Festival Theme</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(Object.keys(seasonalThemes) as Array<keyof typeof seasonalThemes>).map((key) => {
+                        const themeConfig = seasonalThemes[key];
+                        return (
+                          <button
+                            key={key}
+                            onClick={() => setSeasonalTheme(key)}
+                            className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all ${
+                              seasonalTheme === key 
+                                ? "bg-primary/20 ring-2 ring-primary" 
+                                : "hover:bg-gray-200 dark:hover:bg-gray-700"
+                            }`}
+                          >
+                            <span className="text-xl">{themeConfig.icon}</span>
+                            <span className="text-xs font-medium">{themeConfig.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   {/* Mobile Search */}
                   <form onSubmit={handleSearch} className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50" />

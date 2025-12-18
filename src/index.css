@@ -106,6 +106,44 @@ All colors MUST be HSL.
   }
 }
 
+/* Seasonal Theme Variables */
+:root {
+  --seasonal-primary: #ec4899;
+  --seasonal-secondary: #8b5cf6;
+  --seasonal-accent: #10b981;
+  --seasonal-gradient: linear-gradient(135deg, #ec4899, #8b5cf6);
+}
+
+/* Diwali Theme */
+.theme-diwali {
+  --primary: 38 92% 50%;
+  --secondary: 0 72% 51%;
+}
+
+/* Christmas Theme */
+.theme-christmas {
+  --primary: 0 72% 51%;
+  --secondary: 142 71% 45%;
+}
+
+/* Holi Theme */
+.theme-holi {
+  --primary: 330 81% 60%;
+  --secondary: 187 86% 53%;
+}
+
+/* Valentine Theme */
+.theme-valentine {
+  --primary: 330 81% 60%;
+  --secondary: 347 77% 50%;
+}
+
+/* Summer Theme */
+.theme-summer {
+  --primary: 25 95% 53%;
+  --secondary: 199 89% 48%;
+}
+
 @layer base {
   * {
     @apply border-border;

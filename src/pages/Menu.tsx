@@ -24,6 +24,10 @@ import {
   Minus,
   Star,
   Package,
+  MessageSquare,
+  Search,
+  SlidersHorizontal,
+  ArrowUpDown,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -31,6 +35,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { API_URL } from "@/lib/api";
+import { toast } from "sonner";
 
 import kesarPistaKulfi from "@/assets/products/kesar-pista-kulfi.png";
 import mangoKulfi from "@/assets/products/mango-kulfi.png";
@@ -72,6 +77,20 @@ const Menu = () => {
   });
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [isUploadingEditImage, setIsUploadingEditImage] = useState(false);
+
+  // Ratings state
+  const [productRatings, setProductRatings] = useState<Record<string, { averageRating: number; totalReviews: number }>>({});
+  const [reviewModalProduct, setReviewModalProduct] = useState<any | null>(null);
+  const [userRating, setUserRating] = useState(0);
+  const [userReview, setUserReview] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [productReviews, setProductReviews] = useState<any[]>([]);
+
+  // Search & Filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [sortBy, setSortBy] = useState<"default" | "price-low" | "price-high" | "rating">("default");
+  const [showFilters, setShowFilters] = useState(false);
 
   const staticMenuItems = [
     {
@@ -259,13 +278,165 @@ const Menu = () => {
 
   const menuItems = [...staticMenuItems, ...backendMenuItems];
 
+  // Fetch ratings for all products
+  useEffect(() => {
+    const fetchRatings = async () => {
+      if (menuItems.length === 0) return;
+      
+      try {
+        const productIds = menuItems.map((item) => item.id);
+        const res = await fetch(`${API_URL}/api/reviews/ratings`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productIds }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setProductRatings(data.ratings);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    fetchRatings();
+  }, [menuItems.length]);
+
+  // Fetch reviews for a product when review modal opens
+  const openReviewModal = async (item: any) => {
+    setReviewModalProduct(item);
+    setUserRating(0);
+    setUserReview("");
+    setProductReviews([]);
+
+    try {
+      const res = await fetch(`${API_URL}/api/reviews/product/${item.id}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setProductReviews(data.reviews);
+      }
+
+      // Fetch user's existing review if logged in
+      if (token) {
+        const userRes = await fetch(`${API_URL}/api/reviews/user/${item.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const userData = await userRes.json();
+        if (userRes.ok && userData.success && userData.review) {
+          setUserRating(userData.review.rating);
+          setUserReview(userData.review.review || "");
+        }
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  // Submit review
+  const submitReview = async () => {
+    if (!token || !reviewModalProduct || userRating === 0) {
+      toast.error("Please select a rating");
+      return;
+    }
+
+    setIsSubmittingReview(true);
+    try {
+      const res = await fetch(`${API_URL}/api/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: reviewModalProduct.id,
+          productName: reviewModalProduct.name,
+          rating: userRating,
+          review: userReview,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success("Review submitted successfully!");
+        
+        // Update local ratings
+        const updatedRes = await fetch(`${API_URL}/api/reviews/product/${reviewModalProduct.id}`);
+        const updatedData = await updatedRes.json();
+        if (updatedRes.ok && updatedData.success) {
+          setProductRatings((prev) => ({
+            ...prev,
+            [reviewModalProduct.id]: {
+              averageRating: updatedData.averageRating,
+              totalReviews: updatedData.totalReviews,
+            },
+          }));
+          setProductReviews(updatedData.reviews);
+        }
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit review");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  // Star rating component
+  const StarRating = ({ rating, onRate, interactive = false, size = "sm" }: { rating: number; onRate?: (r: number) => void; interactive?: boolean; size?: "sm" | "md" | "lg" }) => {
+    const sizeClass = size === "lg" ? "w-8 h-8" : size === "md" ? "w-6 h-6" : "w-4 h-4";
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`${sizeClass} ${interactive ? "cursor-pointer transition-transform hover:scale-110" : ""} ${
+              star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+            }`}
+            onClick={() => interactive && onRate && onRate(star)}
+          />
+        ))}
+      </div>
+    );
+  };
+
   const filteredItems =
     activeCategory === "All"
       ? menuItems
       : menuItems.filter((item) => item.category === activeCategory);
 
+  // Apply search and filters
+  const searchFilteredItems = filteredItems.filter((item) => {
+    // Search filter
+    if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    // Price filter
+    if (item.price < priceRange[0] || item.price > priceRange[1]) {
+      return false;
+    }
+    return true;
+  });
+
+  // Apply sorting
+  const sortedItems = [...searchFilteredItems].sort((a, b) => {
+    switch (sortBy) {
+      case "price-low":
+        return a.price - b.price;
+      case "price-high":
+        return b.price - a.price;
+      case "rating": {
+        const ratingA = productRatings[a.id]?.averageRating || 0;
+        const ratingB = productRatings[b.id]?.averageRating || 0;
+        return ratingB - ratingA;
+      }
+      default:
+        return 0;
+    }
+  });
+
   const favoriteItems = menuItems.filter((item) => isFavorite(item.id));
-  const displayItems = activeTab === "favorites" ? favoriteItems : filteredItems;
+  const displayItems = activeTab === "favorites" ? favoriteItems : sortedItems;
 
   const startEditProduct = (item: any) => {
     if (!user || user.role !== "admin" || !item.productId) return;
@@ -397,6 +568,140 @@ const Menu = () => {
           </TabsList>
         </Tabs>
 
+        {/* Search & Filter Section */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            {/* Search Bar */}
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search ice creams..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 py-3 h-12 w-full rounded-full border-2 border-primary/20 focus:border-primary text-foreground placeholder:text-gray-400 bg-white/80 dark:bg-gray-800/80 shadow-lg"
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+
+            {/* Filter & Sort Controls */}
+            <div className="flex gap-3 items-center">
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className={`rounded-full px-4 py-2 ${showFilters ? "bg-primary text-white" : ""}`}
+              >
+                <SlidersHorizontal className="w-4 h-4 mr-2" />
+                Filters
+              </Button>
+
+              {/* Sort Dropdown */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as "default" | "price-low" | "price-high" | "rating")}
+                className="h-10 px-4 rounded-full border-2 border-primary/20 bg-white dark:bg-gray-800 text-foreground focus:border-primary outline-none"
+              >
+                <option value="default">Default</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Expanded Filters */}
+          {showFilters && (
+            <div className="mt-4 p-4 bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-lg border border-primary/10">
+              <div className="flex flex-wrap gap-6 items-center">
+                {/* Price Range */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-foreground">Price Range</label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      min="0"
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                      className="w-24 h-10 rounded-xl"
+                      placeholder="Min"
+                    />
+                    <span className="text-muted-foreground">to</span>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                      className="w-24 h-10 rounded-xl"
+                      placeholder="Max"
+                    />
+                  </div>
+                </div>
+
+                {/* Quick Price Filters */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-foreground">Quick Filters</label>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPriceRange([0, 100])}
+                      className="rounded-full text-xs"
+                    >
+                      Under ₹100
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPriceRange([100, 200])}
+                      className="rounded-full text-xs"
+                    >
+                      ₹100 - ₹200
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPriceRange([200, 500])}
+                      className="rounded-full text-xs"
+                    >
+                      ₹200 - ₹500
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPriceRange([0, 1000])}
+                      className="rounded-full text-xs"
+                    >
+                      All Prices
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Clear Filters */}
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setPriceRange([0, 1000]);
+                    setSortBy("default");
+                  }}
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                >
+                  Clear All
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
         {activeTab === "all" && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-center mb-6 flex items-center justify-center gap-2">
@@ -525,6 +830,22 @@ const Menu = () => {
                         )}
                       </div>
                       <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
+                      
+                      {/* Rating Display */}
+                      <div 
+                        className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => openReviewModal(item)}
+                      >
+                        <StarRating rating={productRatings[item.id]?.averageRating || 0} />
+                        <span className="text-xs text-muted-foreground">
+                          {productRatings[item.id]?.averageRating?.toFixed(1) || "0.0"}
+                          {productRatings[item.id]?.totalReviews > 0 && (
+                            <span className="ml-1">({productRatings[item.id]?.totalReviews})</span>
+                          )}
+                        </span>
+                        <MessageSquare className="w-3 h-3 text-muted-foreground" />
+                      </div>
+
                       <p className="text-sm text-muted-foreground">{item.description}</p>
                       <div className="flex items-center justify-between pt-2">
                         <p className="text-2xl font-bold text-primary">₹{item.price}</p>
@@ -780,6 +1101,122 @@ const Menu = () => {
                 </Button>
               </DialogFooter>
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Review Modal */}
+      <Dialog open={!!reviewModalProduct} onOpenChange={() => setReviewModalProduct(null)}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          {reviewModalProduct && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                    <img
+                      src={reviewModalProduct.image}
+                      alt={reviewModalProduct.name}
+                      className="w-10 h-10 object-contain"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-lg">{reviewModalProduct.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <StarRating rating={productRatings[reviewModalProduct.id]?.averageRating || 0} />
+                      <span className="text-sm text-muted-foreground font-normal">
+                        {productRatings[reviewModalProduct.id]?.averageRating?.toFixed(1) || "0.0"} 
+                        ({productRatings[reviewModalProduct.id]?.totalReviews || 0} reviews)
+                      </span>
+                    </div>
+                  </div>
+                </DialogTitle>
+              </DialogHeader>
+
+              {/* Add/Edit Review Section */}
+              {user ? (
+                <div className="border rounded-xl p-4 bg-gradient-to-br from-yellow-50 to-orange-50">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-yellow-500" />
+                    {userRating > 0 ? "Update Your Review" : "Rate This Product"}
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-sm text-muted-foreground">Your Rating</Label>
+                      <div className="mt-1">
+                        <StarRating rating={userRating} onRate={setUserRating} interactive size="lg" />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm text-muted-foreground">Your Review (optional)</Label>
+                      <Textarea
+                        value={userReview}
+                        onChange={(e) => setUserReview(e.target.value)}
+                        placeholder="Share your experience with this ice cream..."
+                        rows={3}
+                        className="mt-1"
+                        maxLength={500}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">{userReview.length}/500</p>
+                    </div>
+                    
+                    <Button
+                      onClick={submitReview}
+                      disabled={isSubmittingReview || userRating === 0}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
+                    >
+                      {isSubmittingReview ? "Submitting..." : userRating > 0 ? "Submit Review" : "Select Rating First"}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border rounded-xl p-4 bg-gray-50 text-center">
+                  <p className="text-muted-foreground">Please login to leave a review</p>
+                  <Button variant="outline" className="mt-2" onClick={() => window.location.href = "/login"}>
+                    Login
+                  </Button>
+                </div>
+              )}
+
+              {/* Reviews List */}
+              <div className="mt-4">
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-blue-500" />
+                  Customer Reviews ({productReviews.length})
+                </h4>
+                
+                {productReviews.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-6">
+                    No reviews yet. Be the first to review!
+                  </p>
+                ) : (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                    {productReviews.map((review) => (
+                      <div key={review._id} className="border rounded-lg p-3 bg-white">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 flex items-center justify-center text-white font-bold text-sm">
+                              {review.userName?.charAt(0).toUpperCase() || "U"}
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{review.userName}</p>
+                              <StarRating rating={review.rating} />
+                            </div>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(review.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        {review.review && (
+                          <p className="text-sm text-gray-600 mt-2">{review.review}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </DialogContent>
       </Dialog>

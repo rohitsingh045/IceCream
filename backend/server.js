@@ -30,6 +30,7 @@ const contactRoutes = require("./Routes/contactRoutes");
 const productRoutes = require("./Routes/ProductRoutes");
 const orderRoutes = require("./Routes/OrderRoutes");
 const uploadRoutes = require("./Routes/uploadRoutes");
+const reviewRoutes = require("./Routes/reviewRoutes");
 
 // API Routes
 app.use("/api/users", userRoutes);
@@ -37,6 +38,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Health check route
 app.get("/", (req, res) => {
